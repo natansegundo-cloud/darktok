@@ -2,12 +2,18 @@ locations:
   - id: kitchen
     name: "Cozinha da república"
     description_en: "small student house kitchen, cluttered shelves, window on the left, worn wooden counter"
+    description_pt: "cozinha pequena de uma casa estudantil, prateleiras cheias, janela à esquerda e bancada de madeira gasta"
     default_light: "late afternoon golden light"
+    default_light_pt: "luz dourada do fim da tarde"
   - id: living_room
     name: "Sala da república"
     description_en: "student house living room, wooden table, newspapers and notebooks"
+    description_pt: "sala de uma casa estudantil, mesa de madeira, jornais e cadernos"
     default_light: "night, warm lamp light"
+    default_light_pt: "noite, luz quente de abajur"
   - id: duda_bedroom
     name: "Quarto da Duda"
     description_en: "small student bedroom, neatly made bed, vanity mirror and warm bedside lamp"
+    description_pt: "quarto pequeno de estudante, cama arrumada, espelho de penteadeira e luminária quente de cabeceira"
     default_light: "night, warm bedside lamp light"
+    default_light_pt: "noite, luz quente de luminária de cabeceira"

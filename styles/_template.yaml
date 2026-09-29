@@ -1,8 +1,13 @@
 id: new_style
 name: "New style"
 style_block: "Describe the visual style here"
+style_block_pt: "Descreva o estilo visual aqui"
 negative_hints: "no text, no watermark"
+negative_hints_pt: "sem texto, sem marca d'água"
 camera_defaults: "subtle handheld feel"
+camera_defaults_pt: "leve sensação de câmera na mão"
 video_motion_defaults: "subtle natural motion"
+video_motion_defaults_pt: "movimento natural sutil"
 notes: ""
 character_rules: ""
+character_rules_pt: ""

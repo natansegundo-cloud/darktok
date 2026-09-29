@@ -490,6 +490,20 @@ workflow:
 
   mode: images\_first            \# images\_first | sequential
 
+pacing:
+
+  words_per_second: 2.5
+
+  min_speech_fill: 0.6
+
+  max_silence_s: 1.5
+
+  max_dialogue_lines: 2
+
+  max_words_per_line: 15
+
+  max_intentional_silences_per_episode: 1
+
 ### 5.8 `config/accounts.yaml`
 
 accounts:
@@ -647,6 +661,14 @@ studio episode new \<series\> \<nn\>     \# cria episódio (pastas \+ templates)
 
 studio validate \<series\> \[ep\]        \# valida YAML, personagens, parents, avisos
 
+studio brief new \<series\>             \# cria brief_pt.md para autoria dentro do projeto
+
+studio brief check \<series\>           \# avisa seções vazias do brief
+
+studio scaffold \<series\> \<episode\>    \# cria episódio com schema completo de shots
+
+studio lint \<series\> \<episode\>        \# valida ritmo, beats e espelhos _pt
+
 studio prompts \<series\> \<ep\>         \# gera prompts de todos os planos pendentes
 
 studio prompts \<series\> \<ep\> \--shot P03
@@ -691,6 +713,26 @@ Todos os comandos devem funcionar offline, imprimir saída legível no terminal 
 - Motor de prompts (anchor, derivative, video, expression-only) com validações da seção 7.4.  
 - `studio prompts`.  
 - Critério de aceite: com a série de exemplo (seção 14), `studio prompts revenge_republic ep01` gera prompts equivalentes aos exemplos da seção 7.3.
+
+**Fase 1.5 — Autoria dentro do projeto**
+
+- Modo Autoria documentado em `AGENTS.md` e `docs/AUTHORING_GUIDE.md`: o agente transforma brief
+  ou roteiro em português em YAML/Markdown versionável, sem depender de outra IA ou ferramenta.
+- `studio brief new/check` e `studio scaffold` para iniciar a autoria offline.
+- Espelhos `_pt` opcionais nos modelos, leitura em português nos prompts e avisos de consistência
+  EN/PT; `negative_hints` e `character_rules` entram nos prompts.
+- `studio lint` com pacing configurável, voice-over, beats e silêncios intencionais; chamado por
+  `studio validate`. A geração de mídia continua manual.
+- Esta fase não inclui créditos, alocação, sessão, status ou publicação.
+
+**Fase 1.6 — Direção de cena para geração econômica**
+
+- Cada vídeo recebe contexto, estado inicial, timeline com ações visíveis, estado final, som e
+  restrições de continuidade, todos com espelho EN/PT.
+- Os templates transformam a sequência em instruções ordenadas para o Flow: setup → starting
+  state → timed direction → end state → sound → do not.
+- O lint avisa quando a direção está incompleta ou sem espelho bilíngue. Esta fase não muda
+  créditos, contas, sessão ou publicação.
 
 **Fase 2 — Créditos, contas e sessão**
 
@@ -799,7 +841,10 @@ Leia \`docs/SPEC.md\` antes de qualquer tarefa.
 - Episódio 1 (série `revenge_republic`): cold open (close da Duda) e cozinha já em vídeo e aprovados; imagem da sala aprovada, vídeo pendente; faltam recusa do presente, Théo e cliffhanger (ver tabela da seção 14).  
 - Apelido: Manu chama Duda de "Dudu".  
 - Qualidade: 360p aceito por custo; avaliar upscale/edição no CapCut.  
-- Fase de desenvolvimento do Studio: **nenhuma iniciada** (próximo passo: Fase 1).
+- Fase de desenvolvimento do Studio: **Fase 1.5 — Autoria dentro do projeto**. O agente pode
+  criar briefs, YAML, roteiros e shots; `studio lint` bloqueia vídeos sem fala/voz off e registra
+  o vazio estimado. Fase atual: **1.6 — Direção de cena para geração econômica**. Fases 2+
+  continuam não implementadas.
 
 ## 17\. LIÇÕES INICIAIS (COPIAR PARA `docs/LESSONS.md`)
 

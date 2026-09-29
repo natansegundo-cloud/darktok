@@ -1,1 +1,2 @@
 locations: []
+# Each location needs description_pt and default_light_pt when the English fields are filled.

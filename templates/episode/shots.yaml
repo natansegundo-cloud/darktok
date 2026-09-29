@@ -1,2 +1,54 @@
-shots: []
-# Add expected_result_pt to each shot with a short Portuguese description of the desired output.
+shots:
+  - id: P01
+    order: 0
+    kind: anchor_image
+    role: hook
+    location: TODO_location_id
+    characters: []
+    framing: medium shot
+    framing_pt: plano médio
+    action: visible action in English
+    action_en: visible action in English
+    action_pt: ação visível em português
+    expected_result_pt: resultado esperado em português
+    camera: camera movement in English
+    camera_pt: movimento de câmera em português
+    gaze: gaze direction in English
+    gaze_pt: direção do olhar em português
+    mood: visual mood in English
+    mood_pt: clima visual em português
+    expression: visible expression in English
+    expression_pt: expressão visível em português
+    parent: null
+    reference_from: null
+    light: lighting in English
+    light_pt: iluminação em português
+    dialogue_pt: []
+    voice_over_pt: []
+    intentional_silence: false
+    beat_pt: mudança concreta na história
+    setup: scene setup in English
+    setup_pt: contexto da cena em português
+    start_state: visible starting state in English
+    start_state_pt: estado inicial visível em português
+    timeline:
+      - at_s: "0-2s"
+        action: timed visible action in English
+        action_pt: ação visível neste intervalo em português
+    timeline_pt:
+      - at_s: "0-2s"
+        action: timed visible action in English
+        action_pt: ação visível neste intervalo em português
+    end_state: visible ending state in English
+    end_state_pt: estado final visível em português
+    sound: sound and dialogue direction in English
+    sound_pt: direção de som e fala em português
+    must_not: continuity constraint in English
+    must_not_pt: restrição de continuidade em português
+    voice_mode: native
+    duration_s: 8
+    account: null
+    status: todo
+    video_attempts: 0
+    files: {}
+    notes: "Troque os valores TODO e duplique este bloco para os demais planos."

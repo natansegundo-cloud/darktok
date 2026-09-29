@@ -9,12 +9,14 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from .config import load_production
 from .loader import LoadedEpisode
 from .models import Character, DialogueLine, Shot, ValidationIssue
+from .pacing import lint_bundle
 
 
 @dataclass(frozen=True)
 class PromptResult:
     shot: Shot
     prompt: str
+    prompt_pt: str
     markdown: str
     reference: str
     cost: int
@@ -85,6 +87,56 @@ def _dialogue_context(
             }
         )
     return result
+
+
+def _voice_over_context(
+    voice_over: list[DialogueLine], characters: dict[str, Character]
+) -> list[dict[str, str]]:
+    result: list[dict[str, str]] = []
+    for line in voice_over:
+        character = characters.get(line.speaker)
+        result.append(
+            {
+                "speaker_name": character.name if character else line.speaker,
+                "text": line.text,
+            }
+        )
+    return result
+
+
+def _pt_value(value: str, field: str) -> str:
+    return value.strip() or f"[falta tradução: campo {field}]"
+
+
+def _direction_context(shot: Shot) -> dict[str, object]:
+    english_timeline = [
+        {
+            "at_s": beat.at_s,
+            "action": beat.action or f"[missing direction: timeline[{index}].action]",
+        }
+        for index, beat in enumerate(shot.timeline)
+    ]
+    portuguese_timeline = [
+        {
+            "at_s": beat.at_s,
+            "action_pt": _pt_value(beat.action_pt, f"timeline[{index}].action_pt"),
+        }
+        for index, beat in enumerate(shot.timeline_pt)
+    ]
+    return {
+        "setup": shot.setup or "[missing direction: setup]",
+        "setup_pt": _pt_value(shot.setup_pt, "setup"),
+        "start_state": shot.start_state or "[missing direction: start_state]",
+        "start_state_pt": _pt_value(shot.start_state_pt, "start_state"),
+        "timeline": english_timeline,
+        "timeline_pt": portuguese_timeline,
+        "end_state": shot.end_state or "[missing direction: end_state]",
+        "end_state_pt": _pt_value(shot.end_state_pt, "end_state"),
+        "sound": shot.sound or "[missing direction: sound]",
+        "sound_pt": _pt_value(shot.sound_pt, "sound"),
+        "must_not": shot.must_not or "[missing direction: must_not]",
+        "must_not_pt": _pt_value(shot.must_not_pt, "must_not"),
+    }
 
 
 def validate_shot(bundle: LoadedEpisode, shot: Shot) -> list[ValidationIssue]:
@@ -170,25 +222,11 @@ def validate_shot(bundle: LoadedEpisode, shot: Shot) -> list[ValidationIssue]:
                 )
             )
 
-    if len(shot.dialogue_pt) > 2:
-        issues.append(
-            ValidationIssue(
-                level="warning", message="More than 2 dialogue lines", shot_id=shot.id
-            )
-        )
-    for line in shot.dialogue_pt:
+    for line in [*shot.dialogue_pt, *shot.voice_over_pt]:
         if line.speaker not in characters:
             issues.append(
                 ValidationIssue(
                     level="error", message=f"Unknown speaker: {line.speaker}", shot_id=shot.id
-                )
-            )
-        if len(line.text.split()) > 18:
-            issues.append(
-                ValidationIssue(
-                    level="warning",
-                    message="Dialogue is long for the configured clip duration",
-                    shot_id=shot.id,
                 )
             )
         for character in characters.values():
@@ -242,6 +280,8 @@ def validate_bundle(bundle: LoadedEpisode) -> list[ValidationIssue]:
         issues.append(ValidationIssue(level="error", message="Enabled cold open needs source_shot"))
     for shot in bundle.shots.shots:
         issues.extend(validate_shot(bundle, shot))
+    root = bundle.series_dir.parent.parent
+    issues.extend(lint_bundle(bundle, load_production(root)).issues)
     return issues
 
 
@@ -273,21 +313,69 @@ def render_prompt(root: Path, bundle: LoadedEpisode, shot: Shot) -> PromptResult
         "characters": selected,
         "style": bundle.style,
         "dialogue": _dialogue_context(shot.dialogue_pt, characters),
+        "voice_over": _voice_over_context(shot.voice_over_pt, characters),
         "reference_names": (
             ", ".join(character.name for character in selected) if shot.reference_from else ""
         ),
         "completely_different_room": False,
         "old_location": "",
+        "framing_pt": _pt_value(shot.framing_pt, "framing"),
+        "action_pt": _pt_value(shot.action_pt, "action"),
+        "camera_pt": (
+            _pt_value(shot.camera_pt, "camera")
+            if shot.camera
+            else _pt_value(bundle.style.camera_defaults_pt, "camera_defaults")
+        ),
+        "gaze_pt": _pt_value(shot.gaze_pt, "gaze") if shot.gaze else "",
+        "mood_pt": _pt_value(shot.mood_pt, "mood") if shot.mood else "",
+        "expression_pt": (
+            _pt_value(shot.expression_pt, "expression") if shot.expression else ""
+        ),
+        "light_pt": (
+            _pt_value(shot.light_pt, "light")
+            if shot.light
+            else _pt_value(location.default_light_pt, "default_light")
+        ),
+        "characters_pt": [
+            {
+                "name": character.name,
+                "lock_block_pt": _pt_value(character.lock_block_pt, "lock_block"),
+            }
+            for character in selected
+        ],
+        "location_pt": {
+            "description": _pt_value(location.description_pt, "description"),
+            "default_light": _pt_value(location.default_light_pt, "default_light"),
+        },
+        "style_pt": {
+            "style_block": _pt_value(bundle.style.style_block_pt, "style_block"),
+            "negative_hints": _pt_value(bundle.style.negative_hints_pt, "negative_hints"),
+            "camera_defaults": _pt_value(bundle.style.camera_defaults_pt, "camera_defaults"),
+            "video_motion_defaults": _pt_value(
+                bundle.style.video_motion_defaults_pt, "video_motion_defaults"
+            ),
+            "character_rules": _pt_value(bundle.style.character_rules_pt, "character_rules"),
+        },
     }
+    context.update(_direction_context(shot))
     if shot.kind == "anchor_image":
         template = environment.get_template("image_anchor.j2")
     elif shot.kind == "derived_image":
         template = environment.get_template("image_derivative.j2")
-    elif shot.kind == "video_expression_only":
+    elif shot.kind == "video_expression_only" or shot.intentional_silence:
         template = environment.get_template("video_expression_only.j2")
     else:
         template = environment.get_template("video_from_image.j2")
     prompt = " ".join(template.render(**context).split())
+    if shot.kind == "anchor_image":
+        pt_template_name = "image_anchor_pt.j2"
+    elif shot.kind == "derived_image":
+        pt_template_name = "image_derivative_pt.j2"
+    elif shot.kind == "video_expression_only" or shot.intentional_silence:
+        pt_template_name = "video_expression_only_pt.j2"
+    else:
+        pt_template_name = "video_from_image_pt.j2"
+    prompt_pt = " ".join(environment.get_template(pt_template_name).render(**context).split())
     if len(prompt) > 1200:
         issues.append(
             ValidationIssue(
@@ -321,10 +409,18 @@ def render_prompt(root: Path, bundle: LoadedEpisode, shot: Shot) -> PromptResult
         f"Conta sugerida: {shot.account or 'não atribuída'} · Custo: {cost} créditos.\n\n"
         f"{blocked}"
         f"### Prompt para copiar no Google Flow\n\n"
-        f"```text\n{prompt}\n```\n"
+        f"```text\n{prompt}\n```\n\n"
+        "### Leitura em português (NÃO copiar para o Flow)\n\n"
+        f"> {prompt_pt}\n"
     )
     return PromptResult(
-        shot=shot, prompt=prompt, markdown=header, reference=reference, cost=cost, issues=issues
+        shot=shot,
+        prompt=prompt,
+        prompt_pt=prompt_pt,
+        markdown=header,
+        reference=reference,
+        cost=cost,
+        issues=issues,
     )
 
 

@@ -19,3 +19,10 @@ workflow:
 audio:
   mode: native
   external_files: false
+pacing:
+  words_per_second: 2.5
+  min_speech_fill: 0.6
+  max_silence_s: 1.5
+  max_dialogue_lines: 2
+  max_words_per_line: 15
+  max_intentional_silences_per_episode: 1

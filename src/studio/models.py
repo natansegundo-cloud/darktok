@@ -23,6 +23,7 @@ class Character(StudioModel):
     age: int | None = None
     lock_version: int = 1
     lock_block: str
+    lock_block_pt: str = ""
     signature_element: str | None = None
     hair_color: str | None = None
     voice_notes: str = ""
@@ -39,7 +40,9 @@ class Location(StudioModel):
     id: str
     name: str = ""
     description_en: str
+    description_pt: str = ""
     default_light: str = "natural light"
+    default_light_pt: str = ""
 
 
 class LocationsFile(StudioModel):
@@ -50,11 +53,16 @@ class StylePreset(StudioModel):
     id: str
     name: str
     style_block: str
+    style_block_pt: str = ""
     negative_hints: str = ""
+    negative_hints_pt: str = ""
     camera_defaults: str = ""
+    camera_defaults_pt: str = ""
     video_motion_defaults: str = "subtle natural motion"
+    video_motion_defaults_pt: str = ""
     notes: str = ""
     character_rules: str = ""
+    character_rules_pt: str = ""
 
 
 class Series(StudioModel):
@@ -102,6 +110,12 @@ class DialogueLine(StudioModel):
     text: str
 
 
+class DirectionBeat(StudioModel):
+    at_s: str
+    action: str = ""
+    action_pt: str = ""
+
+
 class ShotFiles(StudioModel):
     image: str | None = None
     video: str | None = None
@@ -115,17 +129,39 @@ class Shot(StudioModel):
     location: str
     characters: list[str] = Field(default_factory=list)
     framing: str = "medium shot"
+    framing_pt: str = ""
     action: str = ""
     action_en: str = ""
+    action_pt: str = ""
     expected_result_pt: str = ""
     camera: str = ""
+    camera_pt: str = ""
     gaze: str = ""
+    gaze_pt: str = ""
     mood: str = ""
+    mood_pt: str = ""
     expression: str = ""
+    expression_pt: str = ""
     parent: str | None = None
     reference_from: str | None = None
     light: str | None = None
+    light_pt: str = ""
     dialogue_pt: list[DialogueLine] = Field(default_factory=list)
+    voice_over_pt: list[DialogueLine] = Field(default_factory=list)
+    intentional_silence: bool = False
+    beat_pt: str = ""
+    setup: str = ""
+    setup_pt: str = ""
+    start_state: str = ""
+    start_state_pt: str = ""
+    timeline: list[DirectionBeat] = Field(default_factory=list)
+    timeline_pt: list[DirectionBeat] = Field(default_factory=list)
+    end_state: str = ""
+    end_state_pt: str = ""
+    sound: str = ""
+    sound_pt: str = ""
+    must_not: str = ""
+    must_not_pt: str = ""
     voice_mode: Literal["native"] = "native"
     duration_s: int = 8
     account: str | None = None
@@ -160,6 +196,15 @@ class WorkflowConfig(StudioModel):
     mode: Literal["images_first", "sequential"] = "images_first"
 
 
+class PacingConfig(StudioModel):
+    words_per_second: float = 2.5
+    min_speech_fill: float = 0.6
+    max_silence_s: float = 1.5
+    max_dialogue_lines: int = 2
+    max_words_per_line: int = 15
+    max_intentional_silences_per_episode: int = 1
+
+
 class ProductionConfig(StudioModel):
     tool: str = "google_flow"
     aspect_ratio: str = "9:16"
@@ -167,6 +212,7 @@ class ProductionConfig(StudioModel):
     image: ImageConfig = Field(default_factory=ImageConfig)
     accounts: AccountsConfig = Field(default_factory=AccountsConfig)
     workflow: WorkflowConfig = Field(default_factory=WorkflowConfig)
+    pacing: PacingConfig = Field(default_factory=PacingConfig)
 
     def video_credits(self, duration_s: int) -> int:
         try:

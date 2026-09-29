@@ -1,1 +1,3 @@
 characters: []
+# Each character needs a literal English lock_block and its faithful Portuguese reading.
+# lock_block_pt: tradução visual do lock_block, sem sentimentos ou época

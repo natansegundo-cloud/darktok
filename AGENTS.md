@@ -29,4 +29,15 @@
  - Comandos implementados e documentados no README.
  - Testes passando.
  - Exemplo funcionando com `series/revenge_republic`.
- - Sem regressão nas validações da especificação.
+- Sem regressão nas validações da especificação.
+
+ ## Modo Autoria
+
+ Quando o usuário fornecer uma ideia, brief ou roteiro em português, o agente deve criar ou
+ atualizar `series.yaml`, `characters.yaml`, `locations.yaml`, o preset de estilo, `script.md` e
+ `shots.yaml` seguindo `docs/AUTHORING_GUIDE.md`. Depois deve rodar `studio validate` e
+ `studio lint`, corrigindo os arquivos até não haver erros.
+
+ A regra de não fazer chamadas de rede vale para o código do Studio: a CLI continua offline e
+ não automatiza geração de mídia, contas ou navegador. A autoria é feita pelo agente, que lê e
+ escreve os arquivos versionados no repositório.

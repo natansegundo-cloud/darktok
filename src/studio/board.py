@@ -18,6 +18,7 @@ class BoardRow:
     video_file: str
     prompt_file: str
     cost: str
+    summary_pt: str
     next_action: str
 
 
@@ -76,6 +77,7 @@ def board_rows(bundle: LoadedEpisode) -> list[BoardRow]:
                 video_file=_file_label(bundle.episode_dir, video),
                 prompt_file=f"`prompts/{scene_id}.md`",
                 cost=cost,
+                summary_pt=shot.expected_result_pt or shot.beat_pt or "[sem resumo PT]",
                 next_action=_next_action(bundle.episode_dir, shot, parent),
             )
         )
@@ -109,6 +111,9 @@ def render_board(bundle: LoadedEpisode) -> str:
             "O vídeo só deve ser gerado depois que a imagem de origem estiver aprovada.",
         ]
     )
+    lines.extend(["", "## Resumos em português", ""])
+    for row in rows:
+        lines.append(f"- **{row.shot_id}**: {row.summary_pt}")
     return "\n".join(lines) + "\n"
 
 

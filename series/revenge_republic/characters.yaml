@@ -5,6 +5,7 @@ characters:
     role: protagonist
     age: 20
     lock_version: 1
+    lock_block_pt: "Manu, mulher brasileira de 20 anos, pele marrom, olhos amendoados, cabelo castanho-escuro preso em coque alinhado, camiseta branca e cardigan bege"
     lock_block: "Manu, 20-year-old Brazilian woman, brown skin, almond eyes, dark brown hair in a neat bun, white t-shirt and beige cardigan"
     signature_element: "beige cardigan"
     hair_color: brown
@@ -20,6 +21,7 @@ characters:
     role: villain
     age: 20
     lock_version: 2
+    lock_block_pt: "Duda, mulher brasileira de 20 anos, cabelo loiro liso, olhos grandes, maquiagem impecável, blusa de tricô rosa-claro com decote V, dois colares finos dourados e calça preta"
     lock_block: "Duda, 20-year-old Brazilian woman, straight blonde hair, big eyes, flawless makeup, pastel pink V-neck knit top, two thin gold necklaces, black pants"
     signature_element: "gold necklaces"
     hair_color: blonde
@@ -33,6 +35,7 @@ characters:
     role: ally
     age: 21
     lock_version: 1
+    lock_block_pt: "Théo, homem brasileiro de 21 anos, cabelo castanho-escuro despenteado, óculos retangulares e moletom cinza"
     lock_block: "Théo, 21-year-old Brazilian man, messy dark brown hair, rectangular glasses, gray hoodie"
     signature_element: "rectangular glasses"
     hair_color: dark brown
@@ -45,6 +48,7 @@ characters:
     role: love_interest
     age: 21
     lock_version: 1
+    lock_block_pt: "Rafa, homem brasileiro de 21 anos, cabelo preto cacheado, camisa polo azul-marinho e porte atlético"
     lock_block: "Rafa, 21-year-old Brazilian man, dark curly black hair, navy polo shirt, athletic build"
     signature_element: "navy polo shirt"
     hair_color: black

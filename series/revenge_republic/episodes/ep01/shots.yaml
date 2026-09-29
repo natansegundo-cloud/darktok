@@ -1,11 +1,14 @@
 shots:
   - id: P01i
     order: 0
+    beat_pt: "Duda revela que pretende usar a informação contra alguém."
     kind: derived_image
     role: hook
     location: kitchen
     characters: [duda]
     framing: extreme close-up
+    framing_pt: close extremo
+    action_pt: "A expressão doce e frágil de Duda se transforma em um sorriso frio e calculista"
     action: "Duda's sweet fragile expression becomes a cold calculating smirk"
     expected_result_pt: "Um close da Duda na cozinha, com a expressão doce mudando para um sorriso frio e calculista."
     parent: P02i
@@ -14,15 +17,54 @@ shots:
       image: assets/images/EP01_P01i_image.jpg
   - id: P01
     order: 1
+    voice_over_pt: []
+    intentional_silence: false
+    beat_pt: "Duda transforma uma ameaça em plano de chantagem."
+    setup: "Duda is alone in the kitchen, facing the mirror beside the sink; the approved clothes and gold necklaces stay visible."
+    setup_pt: "Duda está sozinha na cozinha, diante do espelho ao lado da pia; a roupa aprovada e os colares dourados permanecem visíveis."
+    start_state: "Duda looks at her reflection with a fragile smile, both hands still, mouth closed."
+    start_state_pt: "Duda olha para o próprio reflexo com um sorriso frágil, as duas mãos paradas e a boca fechada."
+    timeline:
+      - at_s: "0-2s"
+        action: "Duda holds the fragile smile and keeps looking off-camera toward the mirror."
+        action_pt: "Duda mantém o sorriso frágil e continua olhando fora da câmera para o espelho."
+      - at_s: "2-4s"
+        action: "Her eyes narrow and the smile disappears before she speaks."
+        action_pt: "Os olhos de Duda se estreitam e o sorriso desaparece antes de ela falar."
+      - at_s: "4-6s"
+        action: "Duda delivers the threat in a low voice without moving her head."
+        action_pt: "Duda faz a ameaça em voz baixa sem mover a cabeça."
+      - at_s: "6-8s"
+        action: "She lets a cold calculating smirk return and holds it in the mirror."
+        action_pt: "Ela deixa o sorriso frio e calculista voltar e o sustenta no espelho."
+    timeline_pt:
+      - at_s: "0-2s"
+        action_pt: "Duda mantém o sorriso frágil e continua olhando fora da câmera para o espelho."
+      - at_s: "2-4s"
+        action_pt: "Os olhos de Duda se estreitam e o sorriso desaparece antes de ela falar."
+      - at_s: "4-6s"
+        action_pt: "Duda faz a ameaça em voz baixa sem mover a cabeça."
+      - at_s: "6-8s"
+        action_pt: "Ela deixa o sorriso frio e calculista voltar e o sustenta no espelho."
+    end_state: "Duda ends with the cold smirk fixed on her reflection, ready to use the secret."
+    end_state_pt: "Duda termina com o sorriso frio fixo no reflexo, pronta para usar o segredo."
+    sound: "Quiet kitchen room tone, soft running water, Duda speaks one short line in a low voice."
+    sound_pt: "Som baixo da cozinha, água correndo suavemente, Duda fala uma frase curta em voz baixa."
+    must_not: "Do not look directly into the camera, do not change clothes, do not add another character, no cuts."
+    must_not_pt: "Não olhar diretamente para a câmera, não mudar a roupa, não adicionar outro personagem, sem cortes."
     kind: video_from_image
     role: hook
     location: kitchen
     characters: [duda]
     framing: extreme close-up
+    framing_pt: close extremo
+    action_pt: "A expressão doce e frágil muda para um sorriso frio e calculista"
     action: "sweet fragile expression drops into a cold calculating smirk"
     expected_result_pt: "Um close da Duda falando baixo, olhando para o espelho fora da câmera, enquanto a câmera se aproxima lentamente."
     camera: "very slow push-in"
+    camera_pt: "aproximação muito lenta da câmera"
     gaze: "off-camera toward a mirror"
+    gaze_pt: "fora da câmera, em direção ao espelho"
     parent: P01i
     dialogue_pt:
       - speaker: duda
@@ -38,27 +80,69 @@ shots:
     notes: "Usado como cold open, de 0 a 3,5 s."
   - id: P02i
     order: 2
+    beat_pt: "Manu e Duda ficam frente a frente antes da conversa difícil."
     kind: anchor_image
     role: body
     location: kitchen
     characters: [manu, duda]
     framing: wide-medium shot, keep both characters in frame
+    framing_pt: plano aberto médio, mantendo as duas personagens no quadro
+    action_pt: "Manu fica junto à pia enquanto Duda segura uma garrafa térmica"
     action_en: "Manu stands by the sink while Duda holds a thermos"
     expected_result_pt: "Uma imagem aberta da Manu e da Duda na cozinha; Manu está perto da pia e Duda segura a garrafa térmica."
     mood: "quiet tension"
+    mood_pt: "tensão silenciosa"
     status: approved
     files:
       image: assets/images/EP01_P02i_image.jpg
   - id: P02
     order: 3
+    voice_over_pt: []
+    intentional_silence: false
+    beat_pt: "Duda testa Manu, mas Manu esconde o que está sentindo."
+    setup: "Manu stands at the sink and Duda holds the thermos across the kitchen; both characters remain in the same wide frame."
+    setup_pt: "Manu está junto à pia e Duda segura a garrafa térmica do outro lado da cozinha; as duas permanecem no mesmo quadro aberto."
+    start_state: "Water runs. Manu looks down at the sink. Duda watches Manu while keeping both hands on the thermos."
+    start_state_pt: "A água corre. Manu olha para a pia. Duda observa Manu mantendo as duas mãos na garrafa térmica."
+    timeline:
+      - at_s: "0-2s"
+        action: "Duda turns her head toward Manu and asks if she is okay."
+        action_pt: "Duda vira o rosto para Manu e pergunta se ela está bem."
+      - at_s: "2-4s"
+        action: "Manu stops washing and looks at Duda without answering immediately."
+        action_pt: "Manu para de lavar e olha para Duda sem responder imediatamente."
+      - at_s: "4-6s"
+        action: "Manu says she is only tired, then lowers her eyes back to the sink."
+        action_pt: "Manu diz que está apenas cansada e depois baixa os olhos novamente para a pia."
+      - at_s: "6-8s"
+        action: "Duda tightens her grip on the thermos and studies Manu's face."
+        action_pt: "Duda aperta a garrafa térmica e estuda o rosto de Manu."
+    timeline_pt:
+      - at_s: "0-2s"
+        action_pt: "Duda vira o rosto para Manu e pergunta se ela está bem."
+      - at_s: "2-4s"
+        action_pt: "Manu para de lavar e olha para Duda sem responder imediatamente."
+      - at_s: "4-6s"
+        action_pt: "Manu diz que está apenas cansada e depois baixa os olhos novamente para a pia."
+      - at_s: "6-8s"
+        action_pt: "Duda aperta a garrafa térmica e estuda o rosto de Manu."
+    end_state: "Manu hides the suspicion by looking down; Duda remains watching her."
+    end_state_pt: "Manu esconde a suspeita olhando para baixo; Duda continua observando-a."
+    sound: "Running tap, two short lines in Brazilian Portuguese, no music and no extra voices."
+    sound_pt: "Torneira correndo, duas falas curtas em português do Brasil, sem música e sem vozes extras."
+    must_not: "Do not cut away, do not let either character leave, do not add a third character, keep the thermos visible."
+    must_not_pt: "Não cortar para outro lugar, não deixar nenhuma personagem sair, não adicionar uma terceira personagem, manter a garrafa visível."
     kind: video_from_image
     role: body
     location: kitchen
     characters: [manu, duda]
     framing: wide-medium shot, keep both characters in frame
+    framing_pt: plano aberto médio, mantendo as duas personagens no quadro
+    action_pt: "A água corre, Manu vira lentamente o rosto para Duda e as mãos de Duda tremem na garrafa"
     action: "water running from the tap, Manu slowly turning her head toward Duda, Duda's hands trembling on the thermos"
     expected_result_pt: "As duas permanecem na cozinha; a água corre, Manu vira o rosto para Duda e elas trocam as duas falas curtas."
     camera: "slight handheld camera feel, no cuts"
+    camera_pt: "leve sensação de câmera na mão, sem cortes"
     parent: P02i
     dialogue_pt:
       - speaker: duda
@@ -74,27 +158,69 @@ shots:
       video: assets/videos/EP01_P02_video.mp4
   - id: P03i
     order: 4
+    beat_pt: "O presente coloca os quatro personagens no mesmo espaço e cria uma ameaça visível."
     kind: anchor_image
     role: body
     location: living_room
     characters: [manu, duda, theo, rafa]
     framing: medium-wide shot
+    framing_pt: plano médio aberto
+    action_pt: "Os quatro estudantes ficam ao redor de uma mesa de madeira com um pequeno presente embrulhado"
     action_en: "The four students stand around a wooden table with a small wrapped gift"
     expected_result_pt: "Uma imagem aberta dos quatro personagens em volta da mesa da sala, com o presente embrulhado visível."
     mood: "tense social gathering"
+    mood_pt: "encontro social tenso"
     status: approved
     files:
       image: assets/images/EP01_P03i_image.jpg
   - id: P03
     order: 5
+    voice_over_pt: []
+    intentional_silence: false
+    beat_pt: "Rafa confronta Duda e Théo percebe que ela reconheceu o perigo."
+    setup: "All four students are already seated or standing around the wooden table in the living room. The wrapped gift is centered between Rafa and Duda."
+    setup_pt: "Os quatro estudantes já estão sentados ou em pé ao redor da mesa de madeira da sala. O presente embrulhado fica no centro, entre Rafa e Duda."
+    start_state: "Rafa has one hand near the gift, Duda sits upright with both hands on her lap, Manu watches Rafa, and Théo watches Duda."
+    start_state_pt: "Rafa mantém uma mão perto do presente, Duda está ereta com as mãos no colo, Manu observa Rafa e Théo observa Duda."
+    timeline:
+      - at_s: "0-2s"
+        action: "Rafa slides the gift toward Duda and asks whether she knew this would happen."
+        action_pt: "Rafa desliza o presente na direção de Duda e pergunta se ela sabia que aquilo aconteceria."
+      - at_s: "2-4s"
+        action: "Duda looks at the gift for half a second, tightens her fingers on her pants, and looks back up."
+        action_pt: "Duda olha para o presente por meio segundo, aperta os dedos sobre a calça e volta a olhar para cima."
+      - at_s: "4-6s"
+        action: "Duda denies knowing what Rafa means while taking one small step back from the table."
+        action_pt: "Duda nega saber do que Rafa está falando enquanto recua um pequeno passo da mesa."
+      - at_s: "6-8s"
+        action: "Théo notices the reaction and leans slightly toward Manu; Manu keeps the gift in view."
+        action_pt: "Théo percebe a reação e se inclina levemente para Manu; Manu mantém o presente no campo de visão."
+    timeline_pt:
+      - at_s: "0-2s"
+        action_pt: "Rafa desliza o presente na direção de Duda e pergunta se ela sabia que aquilo aconteceria."
+      - at_s: "2-4s"
+        action_pt: "Duda olha para o presente por meio segundo, aperta os dedos sobre a calça e volta a olhar para cima."
+      - at_s: "4-6s"
+        action_pt: "Duda nega saber do que Rafa está falando enquanto recua um pequeno passo da mesa."
+      - at_s: "6-8s"
+        action_pt: "Théo percebe a reação e se inclina levemente para Manu; Manu mantém o presente no campo de visão."
+    end_state: "Duda is one step farther from the gift, Théo is suspicious, and the unopened box remains centered in frame."
+    end_state_pt: "Duda está um passo mais distante do presente, Théo está desconfiado e a caixa fechada continua no centro do quadro."
+    sound: "Chair movement and paper friction, two short lines in order: Rafa first, Duda second."
+    sound_pt: "Ruído de cadeira e papel, duas falas curtas na ordem: Rafa primeiro, Duda depois."
+    must_not: "Do not open the gift, do not let anyone leave, do not change the seating arrangement, no cuts, no direct camera looks."
+    must_not_pt: "Não abrir o presente, não deixar ninguém sair, não mudar a posição do grupo, sem cortes e sem olhares diretos para a câmera."
     kind: video_from_image
     role: body
     location: living_room
     characters: [manu, duda, theo, rafa]
     framing: medium-wide shot, keep the group in frame
+    framing_pt: plano médio aberto, mantendo o grupo no quadro
+    action_pt: "Rafa endurece e aponta para o presente enquanto Duda recua e Théo observa a reação dela"
     action: "Rafa stiffens and gestures toward the gift while Duda takes one step back and Théo watches her reaction"
     expected_result_pt: "Rafa reage ao presente, Duda recua um passo e Théo observa a reação dela enquanto o grupo continua no enquadramento."
     camera: "slow lateral move"
+    camera_pt: "movimento lateral lento"
     parent: P03i
     dialogue_pt:
       - speaker: rafa
@@ -110,25 +236,66 @@ shots:
       video: assets/videos/EP01_P03_video.mp4
   - id: P04i
     order: 6
+    beat_pt: "Duda impede que o presente seja aberto diante de todos."
     kind: derived_image
     role: body
     location: living_room
     characters: [duda, manu]
     framing: medium close-up
+    framing_pt: plano médio fechado
+    action_pt: "Duda recusa o presente enquanto Manu observa sem acreditar"
     action: "Duda refuses the wrapped gift while Manu watches in disbelief"
     expected_result_pt: "Um close médio de Duda recusando o presente enquanto Manu observa, surpresa e sem entender a reação."
     parent: P03i
     status: todo
   - id: P04
     order: 7
+    voice_over_pt: []
+    intentional_silence: false
+    beat_pt: "Duda bloqueia a abertura do presente com uma ordem direta."
+    setup: "Duda and Manu are in a medium close-up beside the same table; the wrapped gift is between them and fully visible."
+    setup_pt: "Duda e Manu estão em um plano médio fechado ao lado da mesma mesa; o presente embrulhado fica entre elas e aparece inteiro."
+    start_state: "Manu reaches one hand toward the gift. Duda notices the hand and turns sharply toward the box."
+    start_state_pt: "Manu estende uma mão em direção ao presente. Duda percebe a mão e vira rapidamente para a caixa."
+    timeline:
+      - at_s: "0-2s"
+        action: "Manu touches the edge of the gift without opening it."
+        action_pt: "Manu toca a borda do presente sem abri-lo."
+      - at_s: "2-4s"
+        action: "Duda places her palm over the lid and pushes the box away from Manu."
+        action_pt: "Duda coloca a palma sobre a tampa e empurra a caixa para longe de Manu."
+      - at_s: "4-6s"
+        action: "Duda says not to open it, keeping her hand firmly on the lid."
+        action_pt: "Duda diz para não abrir, mantendo a mão firme sobre a tampa."
+      - at_s: "6-8s"
+        action: "Manu freezes with her hand in the air and looks from the box to Duda."
+        action_pt: "Manu congela com a mão no ar e olha da caixa para Duda."
+    timeline_pt:
+      - at_s: "0-2s"
+        action_pt: "Manu toca a borda do presente sem abri-lo."
+      - at_s: "2-4s"
+        action_pt: "Duda coloca a palma sobre a tampa e empurra a caixa para longe de Manu."
+      - at_s: "4-6s"
+        action_pt: "Duda diz para não abrir, mantendo a mão firme sobre a tampa."
+      - at_s: "6-8s"
+        action_pt: "Manu congela com a mão no ar e olha da caixa para Duda."
+    end_state: "The box is closed and farther from Manu; Duda controls it and Manu is visibly suspicious."
+    end_state_pt: "A caixa permanece fechada e mais distante de Manu; Duda a controla e Manu demonstra desconfiança."
+    sound: "Paper sliding on wood, one sharp spoken warning, then a short silence."
+    sound_pt: "Papel deslizando sobre madeira, uma advertência curta e depois um breve silêncio."
+    must_not: "Do not show what is inside, do not throw the gift, do not add another action after Manu freezes."
+    must_not_pt: "Não mostrar o que há dentro, não jogar o presente, não adicionar outra ação depois que Manu congela."
     kind: video_from_image
     role: body
     location: living_room
     characters: [duda, manu]
     framing: medium close-up
+    framing_pt: plano médio fechado
+    action_pt: "Duda empurra o presente e Manu fica imóvel"
     action: "Duda pushes the gift away and Manu freezes"
     expected_result_pt: "Duda empurra o presente, Manu congela e Duda diz que aquilo não deve ser aberto."
     camera: "slow push-in"
+    camera_pt: "aproximação lenta da câmera"
     parent: P04i
     dialogue_pt:
       - speaker: duda
@@ -138,25 +305,66 @@ shots:
     status: todo
   - id: P05i
     order: 8
+    beat_pt: "Théo identifica uma reação de Duda que contradiz a defesa dela."
     kind: derived_image
     role: body
     location: living_room
     characters: [theo, duda]
     framing: close two-shot
+    framing_pt: close de dois personagens
+    action_pt: "Théo percebe o alívio no rosto de Duda"
     action: "Théo notices the relief on Duda's face"
     expected_result_pt: "Um close de dois personagens em que Théo percebe o alívio no rosto de Duda antes que ela esconda a expressão."
     parent: P03i
     status: todo
   - id: P05
     order: 9
+    voice_over_pt: []
+    intentional_silence: false
+    beat_pt: "Théo transforma a suspeita em uma pergunta que pressiona Duda."
+    setup: "Théo and Duda remain in the living room two-shot after Duda pushed the gift away; the box stays blurred in the background."
+    setup_pt: "Théo e Duda permanecem no plano de dois no mesmo living depois que Duda empurra o presente; a caixa fica desfocada ao fundo."
+    start_state: "Duda forces a relieved smile while looking at the closed box. Théo watches her instead of the box."
+    start_state_pt: "Duda força um sorriso aliviado olhando para a caixa fechada. Théo observa Duda, não a caixa."
+    timeline:
+      - at_s: "0-2s"
+        action: "Duda lets the relieved smile appear for one second."
+        action_pt: "Duda deixa o sorriso aliviado aparecer por um segundo."
+      - at_s: "2-4s"
+        action: "She notices Théo watching and immediately removes the smile."
+        action_pt: "Ela percebe que Théo está observando e imediatamente desfaz o sorriso."
+      - at_s: "4-6s"
+        action: "Théo leans toward her and asks why she looked relieved."
+        action_pt: "Théo se inclina para ela e pergunta por que ela pareceu aliviada."
+      - at_s: "6-8s"
+        action: "Duda turns her face away and keeps both hands still, refusing to answer."
+        action_pt: "Duda vira o rosto e mantém as duas mãos paradas, recusando-se a responder."
+    timeline_pt:
+      - at_s: "0-2s"
+        action_pt: "Duda deixa o sorriso aliviado aparecer por um segundo."
+      - at_s: "2-4s"
+        action_pt: "Ela percebe que Théo está observando e imediatamente desfaz o sorriso."
+      - at_s: "4-6s"
+        action_pt: "Théo se inclina para ela e pergunta por que ela pareceu aliviada."
+      - at_s: "6-8s"
+        action_pt: "Duda vira o rosto e mantém as duas mãos paradas, recusando-se a responder."
+    end_state: "Théo is openly suspicious; Duda avoids his eyes and the question remains unanswered."
+    end_state_pt: "Théo está abertamente desconfiado; Duda evita os olhos dele e a pergunta fica sem resposta."
+    sound: "Low room tone, one short question from Théo, no music and no additional dialogue."
+    sound_pt: "Som baixo da sala, uma pergunta curta de Théo, sem música e sem diálogo adicional."
+    must_not: "Do not make Duda smile again, do not add a reply, do not cut to the gift, no direct camera look."
+    must_not_pt: "Não fazer Duda sorrir novamente, não adicionar resposta, não cortar para o presente, sem olhar direto para a câmera."
     kind: video_from_image
     role: body
     location: living_room
     characters: [theo, duda]
     framing: close two-shot
+    framing_pt: close de dois personagens
+    action_pt: "Théo se inclina para Duda enquanto o sorriso aliviado dela desaparece"
     action: "Théo leans toward Duda while her relieved smile quickly disappears"
     expected_result_pt: "Théo se inclina para Duda, o sorriso aliviado dela desaparece e ele pergunta por que ela ficou tão aliviada."
     camera: "subtle handheld feel"
+    camera_pt: "leve sensação de câmera na mão"
     parent: P05i
     dialogue_pt:
       - speaker: theo
@@ -166,26 +374,73 @@ shots:
     status: todo
   - id: P06i
     order: 10
+    beat_pt: "Duda se isola e prepara a prova que pode virar o jogo."
     kind: derived_image
     role: cliffhanger
     location: duda_bedroom
     characters: [duda]
     framing: close-up
+    framing_pt: close-up
+    action_pt: "Duda se senta sozinha na cama segurando um celular"
     action: "Duda sits alone on the bed holding a phone"
     expected_result_pt: "Uma imagem em close da Duda sozinha na cama, segurando o celular, em um quarto escuro e tenso."
     parent: P03i
     status: todo
   - id: P06
     order: 11
+    voice_over_pt: []
+    intentional_silence: false
+    beat_pt: "Duda revela que ainda guarda a prova e encerra o episódio em ameaça."
+    setup: "Duda is alone on the bed in her bedroom at night, holding the phone near her chest; the dark doorway stays behind her."
+    setup_pt: "Duda está sozinha na cama do quarto à noite, segurando o celular perto do peito; a porta escura permanece atrás dela."
+    start_state: "Duda sits rigidly with the phone in both hands and keeps her eyes on the dark doorway."
+    start_state_pt: "Duda está rígida com o celular nas duas mãos e mantém os olhos na porta escura."
+    timeline:
+      - at_s: "0-2s"
+        action: "Duda checks the doorway, then lowers her voice without looking at the phone."
+        action_pt: "Duda confere a porta e baixa a voz sem olhar para o celular."
+      - at_s: "2-4s"
+        action: "She says that she still has the proof and presses the phone against her chest."
+        action_pt: "Ela diz que ainda está com a prova e aperta o celular contra o peito."
+      - at_s: "4-6s"
+        action: "Duda slowly turns her head toward the doorway as if she heard a small sound."
+        action_pt: "Duda vira lentamente a cabeça para a porta como se tivesse ouvido um pequeno ruído."
+      - at_s: "6-8s"
+        action: "She keeps the phone hidden under the blanket and holds her breath."
+        action_pt: "Ela esconde o celular sob o cobertor e prende a respiração."
+      - at_s: "8-10s"
+        action: "The camera pushes in on Duda's face while the doorway remains dark and empty."
+        action_pt: "A câmera se aproxima do rosto de Duda enquanto a porta permanece escura e vazia."
+    timeline_pt:
+      - at_s: "0-2s"
+        action_pt: "Duda confere a porta e baixa a voz sem olhar para o celular."
+      - at_s: "2-4s"
+        action_pt: "Ela diz que ainda está com a prova e aperta o celular contra o peito."
+      - at_s: "4-6s"
+        action_pt: "Duda vira lentamente a cabeça para a porta como se tivesse ouvido um pequeno ruído."
+      - at_s: "6-8s"
+        action_pt: "Ela esconde o celular sob o cobertor e prende a respiração."
+      - at_s: "8-10s"
+        action_pt: "A câmera se aproxima do rosto de Duda enquanto a porta permanece escura e vazia."
+    end_state: "Duda has the proof hidden, the doorway is still empty, and the threat is unresolved."
+    end_state_pt: "Duda escondeu a prova, a porta continua vazia e a ameaça permanece sem solução."
+    sound: "Very low room tone, a faint door creak, Duda's single whispered line, then restrained breathing."
+    sound_pt: "Som muito baixo do quarto, um rangido discreto da porta, uma fala sussurrada de Duda e respiração contida."
+    must_not: "Do not reveal another person, do not show the proof, do not make Duda stand up, no jump scare, no cut."
+    must_not_pt: "Não revelar outra pessoa, não mostrar a prova, não fazer Duda levantar, sem susto repentino e sem cortes."
     kind: video_from_image
     role: cliffhanger
     location: duda_bedroom
     characters: [duda]
     framing: close-up
+    framing_pt: close-up
+    action_pt: "Duda baixa a voz e olha para a porta escura"
     action: "Duda lowers her voice and looks toward the dark doorway"
     expected_result_pt: "Um close da Duda falando em voz baixa e olhando para a porta escura enquanto a câmera se aproxima lentamente; ela revela que ainda tem a prova."
     camera: "very slow push-in"
+    camera_pt: "aproximação muito lenta da câmera"
     gaze: "off-camera toward the doorway"
+    gaze_pt: "fora da câmera, em direção à porta"
     parent: P06i
     dialogue_pt:
       - speaker: duda

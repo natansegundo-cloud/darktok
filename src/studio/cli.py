@@ -3,18 +3,23 @@ from __future__ import annotations
 from pathlib import Path
 
 import typer
+from rich.console import Console
 
+from .authoring import check_brief, create_brief, scaffold_episode
 from .board import next_row, write_board
 from .config import load_production
 from .loader import ProjectLoader
+from .pacing import lint_bundle, pacing_table
 from .prompts import validate_bundle, write_prompts
 from .scaffold import init_project, new_episode, new_series, new_style
 
 app = typer.Typer(help="Offline production studio for vertical AI dramas.", no_args_is_help=True)
 series_app = typer.Typer(help="Manage series.", no_args_is_help=True)
 style_app = typer.Typer(help="Manage style presets.", no_args_is_help=True)
+brief_app = typer.Typer(help="Manage Portuguese authoring briefs.", no_args_is_help=True)
 app.add_typer(series_app, name="series")
 app.add_typer(style_app, name="style")
+app.add_typer(brief_app, name="brief")
 
 
 def _root() -> Path:
@@ -95,6 +100,41 @@ def episode_new(series_id: str, number: int) -> None:
     typer.echo(f"Created episode: {path}")
 
 
+@brief_app.command("new")
+def brief_new(series_id: str) -> None:
+    """Create a Portuguese authoring brief for a series."""
+    try:
+        path = create_brief(_root(), series_id)
+    except (FileExistsError, FileNotFoundError) as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    typer.echo(f"Created brief: {path}")
+
+
+@brief_app.command("check")
+def brief_check(series_id: str) -> None:
+    """Report empty sections in a Portuguese authoring brief."""
+    try:
+        missing = check_brief(_root(), series_id)
+    except FileNotFoundError as exc:
+        typer.echo(f"ERROR: {exc}")
+        raise typer.Exit(code=1) from exc
+    if missing:
+        for section in missing:
+            typer.echo(f"WARNING: empty brief section: {section}")
+        raise typer.Exit(code=1)
+    typer.echo(f"OK: brief {series_id}")
+
+
+@app.command("scaffold")
+def scaffold(series_id: str, episode_id: str) -> None:
+    """Create an episode scaffold with the complete bilingual shot schema."""
+    try:
+        path = scaffold_episode(_root(), series_id, episode_id)
+    except (FileExistsError, FileNotFoundError, ValueError) as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    typer.echo(f"Created authoring scaffold: {path}")
+
+
 @app.command()
 def validate(
     series_id: str,
@@ -116,6 +156,7 @@ def validate(
     try:
         bundle = loader.load_episode_bundle(series_id, episode_id)
         issues = validate_bundle(bundle)
+        report = lint_bundle(bundle, load_production(_root()))
     except Exception as exc:
         typer.echo(f"ERROR: {exc}")
         raise typer.Exit(code=1) from exc
@@ -123,9 +164,30 @@ def validate(
         prefix = issue.level.upper()
         suffix = f" [{issue.shot_id}]" if issue.shot_id else ""
         typer.echo(f"{prefix}{suffix}: {issue.message}")
+    Console().print(pacing_table(report))
     if any(issue.level == "error" for issue in issues):
         raise typer.Exit(code=1)
     typer.echo(f"OK: {series_id}/{episode_id}")
+
+
+@app.command()
+def lint(series_id: str, episode_id: str) -> None:
+    """Check spoken pacing, intentional silence, beats, and Portuguese mirrors."""
+    loader = ProjectLoader(_root())
+    try:
+        bundle = loader.load_episode_bundle(series_id, episode_id)
+        report = lint_bundle(bundle, load_production(_root()))
+    except Exception as exc:
+        typer.echo(f"ERROR: {exc}")
+        raise typer.Exit(code=1) from exc
+    for issue in report.issues:
+        prefix = issue.level.upper()
+        suffix = f" [{issue.shot_id}]" if issue.shot_id else ""
+        typer.echo(f"{prefix}{suffix}: {issue.message}")
+    Console().print(pacing_table(report))
+    if any(issue.level == "error" for issue in report.issues):
+        raise typer.Exit(code=1)
+    typer.echo(f"OK: pacing {series_id}/{episode_id}")
 
 
 @app.command()

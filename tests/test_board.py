@@ -12,6 +12,7 @@ def test_board_links_video_to_parent_image() -> None:
     assert row.stage == "VIDEO"
     assert "EP01_P03i_image.jpg" in row.source_image
     assert "P03.md" in row.prompt_file
+    assert row.summary_pt
 
 
 def test_board_makes_missing_media_visible() -> None:
@@ -19,6 +20,7 @@ def test_board_makes_missing_media_visible() -> None:
     board = render_board(bundle)
     assert "MISSING" in board
     assert "P03i" in board
+    assert "Resumos em português" in board
 
 
 def test_next_blocks_video_until_parent_image_file_exists() -> None:
