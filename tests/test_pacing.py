@@ -1,9 +1,12 @@
+import shutil
 from dataclasses import replace
 from pathlib import Path
 
+import yaml
+
 from studio.config import load_production
 from studio.loader import ProjectLoader
-from studio.models import DialogueLine, Shot, ShotsFile
+from studio.models import DialogueLine, ProductionConfig, Shot, ShotsFile
 from studio.pacing import lint_bundle, shot_words
 
 ROOT = Path(__file__).parents[1]
@@ -53,7 +56,17 @@ def test_speech_longer_than_duration_is_an_error() -> None:
 def test_underfilled_speech_reports_empty_seconds() -> None:
     line = DialogueLine(speaker="duda", text="Uma revelação curta")
     report = lint_bundle(_bundle_with(_video(dialogue_pt=[line])), load_production(ROOT))
-    assert any("remain empty" in message for message in _messages(report, "warning"))
+    assert any("faltam" in message for message in _messages(report, "error"))
+    compatibility = lint_bundle(_bundle_with(_video(dialogue_pt=[line])), ProductionConfig())
+    assert any("faltam" in message for message in _messages(compatibility, "warning"))
+
+
+def test_excess_silence_uses_configured_severity() -> None:
+    line = DialogueLine(speaker="duda", text="Uma fala curta")
+    report = lint_bundle(_bundle_with(_video(dialogue_pt=[line])), load_production(ROOT))
+    assert any("Silêncio estimado" in message for message in _messages(report, "error"))
+    compatibility = lint_bundle(_bundle_with(_video(dialogue_pt=[line])), ProductionConfig())
+    assert any("Silêncio estimado" in message for message in _messages(compatibility, "warning"))
 
 
 def test_long_line_and_line_count_are_warnings() -> None:
@@ -116,3 +129,122 @@ def test_missing_direction_mirror_is_a_warning() -> None:
     shot = _video(setup="A room", setup_pt="")
     report = lint_bundle(_bundle_with(shot), load_production(ROOT))
     assert any("setup_pt" in message for message in _messages(report, "warning"))
+
+
+def test_delivery_mirror_warning_and_forbidden_marker_error() -> None:
+    incomplete = DialogueLine(speaker="duda", text="Vai", delivery="low, controlled")
+    report = lint_bundle(_bundle_with(_video(dialogue_pt=[incomplete])), ProductionConfig())
+    assert any("delivery_pt" in message for message in _messages(report, "warning"))
+
+    reverse = DialogueLine(speaker="duda", text="Vai", delivery_pt="baixa")
+    report = lint_bundle(_bundle_with(_video(dialogue_pt=[reverse])), ProductionConfig())
+    assert any("delivery e delivery_pt" in message for message in _messages(report, "warning"))
+
+    contradictory = DialogueLine(
+        speaker="duda",
+        text="Vai",
+        delivery="soft or cold",
+        delivery_pt="suave ou fria",
+    )
+    report = lint_bundle(_bundle_with(_video(dialogue_pt=[contradictory])), load_production(ROOT))
+    assert any("tom duplo" in message for message in _messages(report, "error"))
+
+
+def test_delivery_forbidden_markers_are_configurable() -> None:
+    line = DialogueLine(
+        speaker="duda",
+        text="Vai",
+        delivery="soft / cold",
+        delivery_pt="suave / fria",
+    )
+    production = ProductionConfig(
+        pacing={
+            "delivery_forbidden_markers": [" / "],
+            "enforcement": {"low_fill": "warning", "excess_silence": "warning"},
+        }
+    )
+    report = lint_bundle(_bundle_with(_video(dialogue_pt=[line])), production)
+    assert any("tom duplo" in message for message in _messages(report, "error"))
+
+
+def test_runtime_is_reported_and_warns_outside_ten_percent() -> None:
+    bundle = _bundle_with(_video(duration_s=8), _video("P100", order=1, duration_s=8))
+    bundle = replace(
+        bundle,
+        episode=bundle.episode.model_copy(
+            update={
+                "target_seconds": 30,
+                "cold_open": bundle.episode.cold_open.model_copy(update={"enabled": False}),
+            }
+        ),
+    )
+    report = lint_bundle(bundle, ProductionConfig())
+    assert report.estimated_runtime_s == 16
+    assert any("Runtime estimado" in message for message in _messages(report, "warning"))
+    on_target = replace(
+        bundle,
+        episode=bundle.episode.model_copy(update={"target_seconds": 16}),
+    )
+    on_target_report = lint_bundle(on_target, ProductionConfig())
+    assert not any(
+        "Runtime estimado" in message for message in _messages(on_target_report, "warning")
+    )
+
+
+def test_hook_and_cliffhanger_rules_have_passing_and_failing_cases() -> None:
+    passing = _video(
+        role="hook",
+        dialogue_pt=[
+            DialogueLine(speaker="duda", text="Agora", delivery="low", delivery_pt="baixa")
+        ],
+        timeline=[{"at_s": "0-2s", "action": "She speaks", "action_pt": "Ela fala"}],
+        timeline_pt=[{"at_s": "0-2s", "action_pt": "Ela fala"}],
+    )
+    report = lint_bundle(_bundle_with(passing), ProductionConfig())
+    assert not any("gancho" in message.lower() for message in _messages(report, "warning"))
+
+    failing = _video(
+        role="body",
+        dialogue_pt=[DialogueLine(speaker="duda", text="Agora")],
+        timeline=[{"at_s": "2-4s", "action": "She speaks", "action_pt": "Ela fala"}],
+        timeline_pt=[{"at_s": "2-4s", "action_pt": "Ela fala"}],
+    )
+    failed_bundle = _bundle_with(failing)
+    failed_bundle = replace(
+        failed_bundle,
+        episode=failed_bundle.episode.model_copy(update={"cliffhanger": ""}),
+    )
+    report = lint_bundle(failed_bundle, ProductionConfig())
+    assert any("role: hook" in message for message in _messages(report, "warning"))
+    assert any("antes de 2 segundos" in message for message in _messages(report, "warning"))
+    assert any("cliffhanger" in message for message in _messages(report, "error"))
+
+
+def test_season_finale_may_omit_cliffhanger() -> None:
+    bundle = _bundle_with(
+        _video(role="hook", dialogue_pt=[DialogueLine(speaker="duda", text="Agora")])
+    )
+    bundle = replace(
+        bundle,
+        episode=bundle.episode.model_copy(update={"cliffhanger": "", "season_finale": True}),
+    )
+    report = lint_bundle(bundle, ProductionConfig())
+    assert not any("cliffhanger" in message for message in _messages(report))
+
+
+def test_fixture_copy_fails_when_speech_is_removed(tmp_path: Path) -> None:
+    for directory in ("config", "series", "styles"):
+        shutil.copytree(ROOT / directory, tmp_path / directory)
+    shots_path = tmp_path / "series" / "revenge_republic" / "episodes" / "ep01" / "shots.yaml"
+    data = yaml.safe_load(shots_path.read_text(encoding="utf-8"))
+    shot = next(item for item in data["shots"] if item["id"] == "P04")
+    shot["dialogue_pt"] = []
+    shot["voice_over_pt"] = []
+    shot["intentional_silence"] = False
+    shots_path.write_text(
+        yaml.safe_dump(data, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    )
+
+    bundle = ProjectLoader(tmp_path).load_episode_bundle("revenge_republic", "ep01")
+    report = lint_bundle(bundle, load_production(tmp_path))
+    assert any(issue.level == "error" and issue.shot_id == "P04" for issue in report.issues)

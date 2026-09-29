@@ -10,6 +10,8 @@ characters:
     signature_element: "beige cardigan"
     hair_color: brown
     voice_notes: "gentle, tired"
+    default_delivery: "gentle, tired"
+    default_delivery_pt: "gentil, cansado"
     bio_pt: "Protagonista tentando descobrir a verdade."
     arc_pt: "De confiança ingênua para autonomia."
   - id: duda
@@ -26,6 +28,8 @@ characters:
     signature_element: "gold necklaces"
     hair_color: blonde
     voice_notes: "soft and sweet in public; low and cold when alone"
+    default_delivery: "low, cold, controlled"
+    default_delivery_pt: "baixa, fria, controlada"
     bio_pt: "Vilã socialmente impecável e calculista."
     arc_pt: "De controle absoluto para exposição."
     approved_reference: shared_assets/anchors/EP01_P02_image.jpg
@@ -40,6 +44,8 @@ characters:
     signature_element: "rectangular glasses"
     hair_color: dark brown
     voice_notes: "quiet and observant"
+    default_delivery: "quiet, observant"
+    default_delivery_pt: "baixo, observador"
     bio_pt: "Aliado que percebe as contradições antes dos outros."
     arc_pt: "De espectador para aliado ativo."
   - id: rafa
@@ -53,5 +59,7 @@ characters:
     signature_element: "navy polo shirt"
     hair_color: black
     voice_notes: "irritated but controlled"
+    default_delivery: "irritated, controlled"
+    default_delivery_pt: "irritado, controlado"
     bio_pt: "Namorado de Manu, pressionado pela situação."
     arc_pt: "De namorado defensivo para testemunha."

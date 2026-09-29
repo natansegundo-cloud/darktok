@@ -10,6 +10,7 @@ cold_open:
   transition: "white flash + impact sound"
   title_card_pt: "Horas antes..."
 cliffhanger: ""
+season_finale: false
 key_prop: ""
 status: planning
 metrics: {}

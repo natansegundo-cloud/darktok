@@ -44,9 +44,24 @@ studio lint revenge_republic ep01
 beats repetidos e traduções `_pt` ausentes. Consulte `docs/AUTHORING_GUIDE.md` antes de criar
 uma série ou episódio. A geração de mídia continua manual e offline.
 
+O lint também valida o tom de voz: `delivery` em inglês e `delivery_pt` em português. A fala
+usa seu próprio delivery; na ausência dele, usa o `default_delivery` do personagem. `voice_notes`
+fica apenas como nota de autoria e nunca entra no prompt. A tabela Rich mostra o runtime estimado,
+comparado à meta do episódio, e o comando retorna erro quando a severidade configurada exigir.
+
 Para vídeos, os prompts agora carregam direção por tempo: contexto, estado inicial, ações em
 ordem, estado final, som e restrições. Escreva o que a câmera deve ver, não apenas a intenção
 dramática.
+
+`series/revenge_republic` é uma fixture funcional de testes, está pausada e não é material de
+publicação. A série real ainda não foi criada. A estratégia aprovada separa CRESCIMENTO, com
+vídeos curtos e baratos, de MONETIZAÇÃO, com episódios acima de 60 segundos em 1080p.
+
+## Fase 1.7 — Endurecimento de ritmo e fala
+
+Esta fase adiciona delivery sem tons contraditórios, enforcement configurável para preenchimento
+e silêncio, validação de gancho e cliffhanger, runtime estimado com cold open e cobertura completa
+de testes. Créditos, sessão, métricas e publicação continuam fora do escopo.
 
 ## Fase 1
 

@@ -26,8 +26,8 @@ shots:
     start_state_pt: "Duda olha para o próprio reflexo com um sorriso frágil, as duas mãos paradas e a boca fechada."
     timeline:
       - at_s: "0-2s"
-        action: "Duda holds the fragile smile and keeps looking off-camera toward the mirror."
-        action_pt: "Duda mantém o sorriso frágil e continua olhando fora da câmera para o espelho."
+        action: "Duda delivers the threat in a low voice while holding the fragile smile."
+        action_pt: "Duda faz a ameaça em voz baixa enquanto mantém o sorriso frágil."
       - at_s: "2-4s"
         action: "Her eyes narrow and the smile disappears before she speaks."
         action_pt: "Os olhos de Duda se estreitam e o sorriso desaparece antes de ela falar."
@@ -69,6 +69,12 @@ shots:
     dialogue_pt:
       - speaker: duda
         text: "Se ele chegar perto demais... eu conto que ela tá com outro."
+        delivery: "low, cold, controlled"
+        delivery_pt: "baixa, fria, controlada"
+      - speaker: duda
+        text: "Ninguém jamais vai acreditar nela."
+        delivery: "low, cold, controlled"
+        delivery_pt: "baixa, fria, controlada"
     voice_mode: native
     duration_s: 8
     account: conta1
@@ -146,9 +152,9 @@ shots:
     parent: P02i
     dialogue_pt:
       - speaker: duda
-        text: "Manu... você tá bem?"
+        text: "Manu... você tá bem? Você parece que não dormiu."
       - speaker: manu
-        text: "Tô, Dudu. Só cansada."
+        text: "Tô, Dudu. Só cansada. Mas vou ficar bem."
     duration_s: 8
     account: conta1
     status: approved
@@ -226,7 +232,7 @@ shots:
       - speaker: rafa
         text: "Você sabia que isso ia acontecer?"
       - speaker: duda
-        text: "Eu não sei do que você tá falando."
+        text: "Eu não sei do que você tá falando, Rafa, de verdade."
     duration_s: 8
     account: conta1
     status: approved
@@ -299,7 +305,9 @@ shots:
     parent: P04i
     dialogue_pt:
       - speaker: duda
-        text: "Não abre isso aqui."
+        text: "Não abre isso aqui. Ainda não, eu preciso saber quem mandou o presente."
+      - speaker: manu
+        text: "Então me explica agora."
     duration_s: 8
     account: conta1
     status: todo
@@ -350,10 +358,10 @@ shots:
         action_pt: "Duda vira o rosto e mantém as duas mãos paradas, recusando-se a responder."
     end_state: "Théo is openly suspicious; Duda avoids his eyes and the question remains unanswered."
     end_state_pt: "Théo está abertamente desconfiado; Duda evita os olhos dele e a pergunta fica sem resposta."
-    sound: "Low room tone, one short question from Théo, no music and no additional dialogue."
-    sound_pt: "Som baixo da sala, uma pergunta curta de Théo, sem música e sem diálogo adicional."
-    must_not: "Do not make Duda smile again, do not add a reply, do not cut to the gift, no direct camera look."
-    must_not_pt: "Não fazer Duda sorrir novamente, não adicionar resposta, não cortar para o presente, sem olhar direto para a câmera."
+    sound: "Low room tone, two short lines in Brazilian Portuguese, no music or additional voices."
+    sound_pt: "Som baixo da sala, duas falas curtas em português do Brasil, sem música ou vozes extras."
+    must_not: "Do not make Duda smile again, do not add a third line, do not cut to the gift, no direct camera look."
+    must_not_pt: "Não fazer Duda sorrir novamente, não adicionar uma terceira fala, não cortar para o presente, sem olhar direto para a câmera."
     kind: video_from_image
     role: body
     location: living_room
@@ -369,6 +377,8 @@ shots:
     dialogue_pt:
       - speaker: theo
         text: "Por que você ficou tão aliviada?"
+      - speaker: duda
+        text: "Eu não fiquei aliviada. Você entendeu tudo errado desde o começo."
     duration_s: 8
     account: conta1
     status: todo
@@ -444,7 +454,11 @@ shots:
     parent: P06i
     dialogue_pt:
       - speaker: duda
-        text: "A prova ainda tá comigo."
+        text: "A prova ainda tá comigo, e ninguém vai encontrar o celular escondido."
+        delivery: "low, cold, controlled"
+        delivery_pt: "baixa, fria, controlada"
+      - speaker: duda
+        text: "Vou decidir quando mostrar tudo para destruir a mentira de vez."
     duration_s: 10
     account: conta1
     status: todo

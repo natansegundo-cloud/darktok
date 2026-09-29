@@ -57,8 +57,28 @@ def test_voice_over_is_rendered_and_intentional_silence_uses_expression_prompt()
     )
     result = render_prompt(ROOT, bundle, voice_over)
     assert (
-        'Voice-over of Duda, in Brazilian Portuguese: "A prova ainda está comigo".'
+        'Voice-over of Duda, in Brazilian Portuguese (low, cold, controlled): '
+        '"A prova ainda está comigo".'
         in result.prompt
+    )
+    assert "soft and sweet in public" not in result.prompt
+    explicit = shot.model_copy(
+        update={
+            "dialogue_pt": [],
+            "voice_over_pt": [
+                DialogueLine(
+                    speaker="duda",
+                    text="A prova ainda está comigo",
+                    delivery="whispered, controlled",
+                    delivery_pt="sussurrada, controlada",
+                )
+            ],
+        }
+    )
+    explicit_result = render_prompt(ROOT, bundle, explicit)
+    assert (
+        "Voice-over of Duda, in Brazilian Portuguese (whispered, controlled)"
+        in explicit_result.prompt
     )
     silent = shot.model_copy(update={"dialogue_pt": [], "intentional_silence": True})
     silent_result = render_prompt(ROOT, bundle, silent)

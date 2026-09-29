@@ -6,10 +6,10 @@ from dataclasses import dataclass
 from rich.table import Table
 
 from .loader import LoadedEpisode
-from .models import ProductionConfig, Shot, ValidationIssue
+from .models import Character, ProductionConfig, Shot, ValidationIssue
 
 VIDEO_KINDS = {"video_from_image", "video_expression_only"}
-WORD_RE = re.compile(r"\b[\wÀ-ÖØ-öø-ÿ]+(?:['’\-][\wÀ-ÖØ-öø-ÿ]+)*\b")
+WORD_RE = re.compile(r"\b[\w]+(?:['’\-][\w]+)*\b", re.UNICODE)
 
 
 @dataclass(frozen=True)
@@ -26,6 +26,8 @@ class PacingRow:
 class PacingReport:
     rows: list[PacingRow]
     issues: list[ValidationIssue]
+    estimated_runtime_s: float = 0.0
+    target_seconds: float = 0.0
 
 
 def count_words(text: str) -> int:
@@ -39,6 +41,72 @@ def shot_words(shot: Shot) -> int:
 
 def _issue(level: str, message: str, shot_id: str | None = None) -> ValidationIssue:
     return ValidationIssue(level=level, message=message, shot_id=shot_id)
+
+
+def _forbidden_delivery_issue(
+    delivery: str | None,
+    field: str,
+    markers: list[str],
+    shot_id: str | None = None,
+) -> ValidationIssue | None:
+    if not delivery:
+        return None
+    for marker in markers:
+        if marker and marker.casefold() in delivery.casefold():
+            return _issue(
+                "error",
+                f"{field} contém marcador de tom duplo proibido: {marker!r}",
+                shot_id,
+            )
+    return None
+
+
+def _delivery_issues_for_lines(shot: Shot, markers: list[str]) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+    for line in [*shot.dialogue_pt, *shot.voice_over_pt]:
+        has_delivery = bool(line.delivery and line.delivery.strip())
+        has_delivery_pt = bool(line.delivery_pt and line.delivery_pt.strip())
+        if has_delivery != has_delivery_pt:
+            issues.append(
+                _issue(
+                    "warning",
+                    f"Fala de {line.speaker} precisa de delivery e delivery_pt juntos",
+                    shot.id,
+                )
+            )
+        forbidden = _forbidden_delivery_issue(
+            line.delivery, f"delivery de {line.speaker}", markers, shot.id
+        )
+        if forbidden:
+            issues.append(forbidden)
+    return issues
+
+
+def _character_delivery_issues(
+    characters: dict[str, Character], markers: list[str]
+) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+    for character in characters.values():
+        default_delivery = character.default_delivery
+        default_delivery_pt = character.default_delivery_pt
+        if bool(default_delivery and default_delivery.strip()) != bool(
+            default_delivery_pt and default_delivery_pt.strip()
+        ):
+            issues.append(
+                _issue(
+                    "warning",
+                    f"Personagem {character.id} precisa de default_delivery e "
+                    "default_delivery_pt juntos",
+                )
+            )
+        forbidden = _forbidden_delivery_issue(
+            default_delivery,
+            f"default_delivery de {character.id}",
+            markers,
+        )
+        if forbidden:
+            issues.append(forbidden)
+    return issues
 
 
 def _missing_pt_issues(bundle: LoadedEpisode, shot: Shot) -> list[ValidationIssue]:
@@ -119,6 +187,60 @@ def _direction_issues(shot: Shot) -> list[ValidationIssue]:
     return issues
 
 
+def _timeline_start(at_s: str) -> float | None:
+    match = re.match(r"\s*(\d+(?:[.,]\d+)?)", at_s)
+    if not match:
+        return None
+    return float(match.group(1).replace(",", "."))
+
+
+def _hook_issues(
+    bundle: LoadedEpisode, ordered: list[Shot], severity: str
+) -> list[ValidationIssue]:
+    videos = [shot for shot in ordered if shot.kind in VIDEO_KINDS]
+    if not videos:
+        return [_issue(severity, "Episódio precisa de um clipe de gancho")]
+
+    candidate = videos[0]
+    if bundle.episode.cold_open.enabled and bundle.episode.cold_open.source_shot:
+        source = next(
+            (shot for shot in ordered if shot.id == bundle.episode.cold_open.source_shot),
+            None,
+        )
+        if source and source.kind in VIDEO_KINDS:
+            candidate = source
+
+    issues: list[ValidationIssue] = []
+    if candidate.role != "hook":
+        issues.append(
+            _issue(
+                severity,
+                f"Primeiro clipe {candidate.id} precisa ter role: hook",
+                candidate.id,
+            )
+        )
+    lines = [*candidate.dialogue_pt, *candidate.voice_over_pt]
+    if not lines:
+        issues.append(
+            _issue(
+                severity,
+                f"Gancho {candidate.id} precisa começar com fala ou voice-over",
+                candidate.id,
+            )
+        )
+    first_timeline = candidate.timeline[0] if candidate.timeline else None
+    start_s = _timeline_start(first_timeline.at_s) if first_timeline else None
+    if start_s is None or start_s >= 2:
+        issues.append(
+            _issue(
+                severity,
+                f"A fala do gancho {candidate.id} precisa começar antes de 2 segundos",
+                candidate.id,
+            )
+        )
+    return issues
+
+
 def lint_bundle(bundle: LoadedEpisode, production: ProductionConfig) -> PacingReport:
     config = production.pacing
     rows: list[PacingRow] = []
@@ -126,6 +248,8 @@ def lint_bundle(bundle: LoadedEpisode, production: ProductionConfig) -> PacingRe
     ordered = sorted(bundle.shots.shots, key=lambda item: item.order)
     previous_beat = ""
     intentional_count = 0
+    characters = {item.id: item for item in bundle.characters.characters}
+    issues.extend(_character_delivery_issues(characters, config.delivery_forbidden_markers))
 
     for shot in ordered:
         words = shot_words(shot)
@@ -156,8 +280,8 @@ def lint_bundle(bundle: LoadedEpisode, production: ProductionConfig) -> PacingRe
             continue
 
         issues.extend(_direction_issues(shot))
-
         lines = [*shot.dialogue_pt, *shot.voice_over_pt]
+        issues.extend(_delivery_issues_for_lines(shot, config.delivery_forbidden_markers))
         if not lines and not shot.intentional_silence:
             issues.append(
                 _issue(
@@ -174,21 +298,22 @@ def lint_bundle(bundle: LoadedEpisode, production: ProductionConfig) -> PacingRe
                     shot.id,
                 )
             )
-        if speech_seconds < config.min_speech_fill * duration:
+        if not shot.intentional_silence and speech_seconds < config.min_speech_fill * duration:
             issues.append(
                 _issue(
-                    "warning",
-                    f"Estimated speech fills {speech_seconds:.1f}s; "
-                    f"{empty_seconds:.1f}s remain empty",
+                    config.enforcement.low_fill,
+                    f"Fala estimada preenche {speech_seconds:.1f}s; faltam "
+                    f"{empty_seconds:.1f}s para preencher o clipe",
                     shot.id,
                 )
             )
         if empty_seconds > config.max_silence_s and not shot.intentional_silence:
             issues.append(
                 _issue(
-                    "warning",
-                    f"Estimated silence ({empty_seconds:.1f}s) exceeds max_silence_s "
-                    f"({config.max_silence_s:.1f}s)",
+                    config.enforcement.excess_silence,
+                    f"Silêncio estimado de {empty_seconds:.1f}s excede o máximo "
+                    f"configurado de {config.max_silence_s:.1f}s; faltam "
+                    f"{empty_seconds:.1f}s para preencher o clipe",
                     shot.id,
                 )
             )
@@ -223,11 +348,46 @@ def lint_bundle(bundle: LoadedEpisode, production: ProductionConfig) -> PacingRe
                 f"{config.max_intentional_silences_per_episode}",
             )
         )
-    return PacingReport(rows=rows, issues=issues)
+
+    if not bundle.episode.season_finale and not bundle.episode.cliffhanger.strip():
+        issues.append(_issue("error", "Episódio precisa ter cliffhanger preenchido"))
+    issues.extend(_hook_issues(bundle, ordered, config.enforcement.missing_hook))
+
+    estimated_runtime_s = sum(
+        float(shot.duration_s)
+        for shot in ordered
+        if shot.kind in VIDEO_KINDS and shot.status != "rejected"
+    )
+    if bundle.episode.cold_open.enabled:
+        estimated_runtime_s += max(
+            bundle.episode.cold_open.trim_end_s - bundle.episode.cold_open.trim_start_s,
+            0.0,
+        )
+    target_seconds = float(bundle.episode.target_seconds)
+    if target_seconds and abs(estimated_runtime_s - target_seconds) / target_seconds > 0.10:
+        difference = abs(estimated_runtime_s - target_seconds) / target_seconds * 100
+        issues.append(
+            _issue(
+                "warning",
+                f"Runtime estimado de {estimated_runtime_s:.1f}s difere "
+                f"{difference:.1f}% da meta de {target_seconds:.1f}s",
+            )
+        )
+    return PacingReport(
+        rows=rows,
+        issues=issues,
+        estimated_runtime_s=estimated_runtime_s,
+        target_seconds=target_seconds,
+    )
 
 
 def pacing_table(report: PacingReport) -> Table:
-    table = Table(title="Pacing lint")
+    table = Table(
+        title=(
+            f"Pacing lint · Runtime estimado: {report.estimated_runtime_s:.1f}s "
+            f"/ meta: {report.target_seconds:.1f}s"
+        )
+    )
     table.add_column("Plano")
     table.add_column("Tipo")
     table.add_column("Palavras", justify="right")
@@ -243,4 +403,12 @@ def pacing_table(report: PacingReport) -> Table:
             f"{row.fill_percent:.0f}%",
             f"{row.empty_seconds:.1f}",
         )
+    table.add_row(
+        "TOTAL",
+        "runtime",
+        "",
+        "",
+        "",
+        f"{report.estimated_runtime_s:.1f}s / meta {report.target_seconds:.1f}s",
+    )
     return table

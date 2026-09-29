@@ -72,8 +72,10 @@ status: planning
 
 Cada personagem tem `id`, `name`, `role`, `age`, `lock_version`, `lock_block` e `lock_block_pt`.
 Use `nicknames` com `used_by` para apelidos controlados; `signature_element` deve aparecer no
-lock; `hair_color` ajuda a detectar confusão no mesmo plano. `voice_notes`, `bio_pt`, `arc_pt` e
-`approved_reference` completam a ficha sem entrar no prompt visual automaticamente.
+lock; `hair_color` ajuda a detectar confusão no mesmo plano. `default_delivery` e
+`default_delivery_pt` definem um único tom de voz para falas que não especificarem delivery.
+`voice_notes`, `bio_pt`, `arc_pt` e `approved_reference` completam a ficha; `voice_notes` é nota
+de autoria e nunca entra no prompt.
 
 ### `locations.yaml`
 
@@ -96,8 +98,17 @@ Em `cold_open`, marque `enabled`, `source_shot`, `trim_start_s`, `trim_end_s`, `
 
 Cada plano precisa de `id`, `order`, `kind`, `role`, `location`, `characters`, `framing`/`framing_pt`,
 ação filmável, `beat_pt`, `parent` quando deriva de imagem, `dialogue_pt` ou `voice_over_pt` em
-vídeos, `duration_s`, `status` e `files` quando houver mídia. Use `intentional_silence` somente
+vídeos, `duration_s`, `status` e `files` quando houver mídia. Cada fala pode ter `delivery` e
+`delivery_pt`; se faltar, o Studio tenta o default do personagem. Use `intentional_silence` somente
 para um golpe narrativo deliberado. `account` e `video_attempts` registram produção manual.
+
+```yaml
+dialogue_pt:
+  - speaker: duda
+    text: "A prova ainda está comigo."
+    delivery: "low, cold, controlled"
+    delivery_pt: "baixa, fria, controlada"
+```
 
 Para vídeos, a direção deve ser concreta nos campos `setup`/`setup_pt`,
 `start_state`/`start_state_pt`, `timeline`/`timeline_pt`, `end_state`/`end_state_pt`,
@@ -138,12 +149,17 @@ ação ou fala que o revele.
 - Todo clipe tem `dialogue_pt` ou `voice_over_pt`; silêncio é um golpe explícito em
   `intentional_silence` e ocorre no máximo uma vez por episódio.
 - Use no máximo duas linhas faladas por clipe, com no máximo 15 palavras por linha.
+- `delivery` deve ter um único tom; não use alternativas com `or`, `when` ou `;`. Sempre preencha
+  seu espelho `delivery_pt`.
 - Cada fala deve trazer conflito ou informação nova, não apenas repetir uma emoção.
 - Todo plano tem `beat_pt`; dois planos consecutivos não repetem o mesmo beat.
 - Comece cada cena já no meio da ação; não gaste o clipe com personagem entrando ou saindo.
 - Prefira elementos visíveis como mensagens, prints, stories, áudios e objetos.
 - Use um cold open de aproximadamente três segundos com o maior impacto.
 - Termine o episódio em gancho. A revelação principal acontece dentro do último episódio.
+- O primeiro clipe ou cold open deve ser `role: hook` e iniciar a fala antes de 2 segundos.
+- O episódio precisa de `cliffhanger`, exceto quando `season_finale: true`.
+- Revise o runtime estimado e mantenha a diferença em até 10% da meta.
 
 ## Checklist de entrega
 
@@ -153,6 +169,7 @@ ação ou fala que o revele.
 - [ ] Cada plano tem beat novo e ação filmável.
 - [ ] Cada vídeo tem contexto, estado inicial, timeline, estado final e restrições.
 - [ ] Cada vídeo tem fala/voz off ou silêncio intencional permitido.
+- [ ] Cada fala tem delivery/delivery_pt coerentes, ou usa um default único do personagem.
 - [ ] `studio validate` não tem ERROR.
 - [ ] `studio lint` não tem ERROR; avisos foram revisados.
 - [ ] O roteiro começa as cenas no meio da ação e termina em gancho.

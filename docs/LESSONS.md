@@ -11,3 +11,9 @@
 - O `lock_block` deve acompanhar exatamente a imagem aprovada e ser copiado literalmente.
 - Imagem é gratuita; vídeos em 360p custam 5 créditos (6 s), 6 créditos (8 s) ou 7 créditos
   (10 s), conforme `config/production.yaml`.
+- `voice_notes` pode registrar contexto de autoria, mas nunca deve virar instrução no prompt:
+  use `delivery` da fala e, como fallback, um único `default_delivery` do personagem; mantenha
+  sempre o espelho `_pt`.
+- O ritmo econômico precisa bloquear fala curta demais quando configurado: o lint informa quantos
+  segundos faltam preencher, valida o gancho antes de 2 s, o cliffhanger e o runtime com cold open.
+- `series/revenge_republic` é apenas fixture pausada de testes; a série real ainda não existe.

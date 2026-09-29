@@ -26,3 +26,11 @@ pacing:
   max_dialogue_lines: 2
   max_words_per_line: 15
   max_intentional_silences_per_episode: 1
+  delivery_forbidden_markers:
+    - " or "
+    - ";"
+    - " when "
+  enforcement:
+    low_fill: error
+    excess_silence: error
+    missing_hook: warning

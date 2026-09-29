@@ -17,6 +17,8 @@ def test_video_costs_are_configured_by_duration() -> None:
 def test_example_bundle_loads() -> None:
     bundle = ProjectLoader(ROOT).load_episode_bundle("revenge_republic", "ep01")
     assert bundle.series.style == "realistic_drama"
+    assert bundle.series.status == "paused"
+    assert "fixture" in bundle.series.notes.lower()
     assert bundle.episode.cold_open.source_shot == "P01"
     assert len(bundle.shots.shots) == 12
 
@@ -28,6 +30,18 @@ def test_pacing_and_authoring_fields_are_optional() -> None:
     assert shot.intentional_silence is False
     assert shot.beat_pt
     assert load_production(ROOT).pacing.words_per_second == 2.5
+    assert load_production(ROOT).pacing.enforcement.low_fill == "error"
+    assert load_production(ROOT).pacing.delivery_forbidden_markers
+
+
+def test_delivery_fields_are_optional_and_character_defaults_are_loaded() -> None:
+    bundle = ProjectLoader(ROOT).load_episode_bundle("revenge_republic", "ep01")
+    line = next(item for item in bundle.shots.shots if item.id == "P01").dialogue_pt[0]
+    duda = next(item for item in bundle.characters.characters if item.id == "duda")
+    assert line.delivery == "low, cold, controlled"
+    assert line.delivery_pt == "baixa, fria, controlada"
+    assert duda.default_delivery == "low, cold, controlled"
+    assert duda.default_delivery_pt == "baixa, fria, controlada"
 
 
 def test_example_video_has_timed_direction() -> None:

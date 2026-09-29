@@ -27,6 +27,8 @@ class Character(StudioModel):
     signature_element: str | None = None
     hair_color: str | None = None
     voice_notes: str = ""
+    default_delivery: str | None = None
+    default_delivery_pt: str | None = None
     bio_pt: str = ""
     arc_pt: str = ""
     approved_reference: str | None = None
@@ -79,6 +81,7 @@ class Series(StudioModel):
     synopsis: str = ""
     season_hook: str = ""
     status: Literal["idea", "planning", "in_production", "paused", "released"] = "planning"
+    notes: str = ""
 
 
 class ColdOpen(StudioModel):
@@ -97,6 +100,7 @@ class Episode(StudioModel):
     target_seconds: int = 60
     cold_open: ColdOpen = Field(default_factory=ColdOpen)
     cliffhanger: str = ""
+    season_finale: bool = False
     key_prop: str = ""
     status: Literal[
         "planning", "scripted", "prompts_ready", "generating", "editing", "ready", "posted"
@@ -108,6 +112,8 @@ class Episode(StudioModel):
 class DialogueLine(StudioModel):
     speaker: str
     text: str
+    delivery: str | None = None
+    delivery_pt: str | None = None
 
 
 class DirectionBeat(StudioModel):
@@ -196,6 +202,12 @@ class WorkflowConfig(StudioModel):
     mode: Literal["images_first", "sequential"] = "images_first"
 
 
+class PacingEnforcement(StudioModel):
+    low_fill: Literal["error", "warning"] = "warning"
+    excess_silence: Literal["error", "warning"] = "warning"
+    missing_hook: Literal["error", "warning"] = "warning"
+
+
 class PacingConfig(StudioModel):
     words_per_second: float = 2.5
     min_speech_fill: float = 0.6
@@ -203,6 +215,10 @@ class PacingConfig(StudioModel):
     max_dialogue_lines: int = 2
     max_words_per_line: int = 15
     max_intentional_silences_per_episode: int = 1
+    delivery_forbidden_markers: list[str] = Field(
+        default_factory=lambda: [" or ", ";", " when "]
+    )
+    enforcement: PacingEnforcement = Field(default_factory=PacingEnforcement)
 
 
 class ProductionConfig(StudioModel):

@@ -55,6 +55,8 @@ studio board revenge_republic ep01
 O lint é obrigatório antes de gerar vídeo. Todo clipe precisa carregar diálogo ou voz off; um
 silêncio só pode ser marcado como `intentional_silence` e o episódio aceita no máximo um.
 Revise a tabela Rich: ela mostra palavras, segundos de fala, preenchimento e segundos vazios.
+Ela também mostra o runtime estimado contra a meta do episódio. Corrija qualquer ERROR de
+preenchimento, silêncio excessivo, delivery contraditório ou gancho antes de gerar.
 No prompt de vídeo, confira também a sequência `Scene setup` → `Starting state` → `Timed
 direction` → `End state`. Ela é a direção para o modelo econômico, não um resumo opcional.
 
@@ -170,11 +172,13 @@ manda gerar/aprovar a imagem primeiro.
 ```text
 [ ] Há fala ou voice_over_pt; silêncio está marcado apenas como golpe intencional
 [ ] Há no máximo duas linhas faladas, com no máximo 15 palavras cada
+[ ] Cada fala tem um delivery único; `voice_notes` não deve aparecer no prompt
 [ ] beat_pt diz o que muda na história e não repete o beat anterior
 [ ] A timeline descreve ações visíveis com início, reação e estado final
 [ ] Sound e Do not estão coerentes com a continuidade da cena
 [ ] Campos em inglês usados no prompt têm seus espelhos _pt
 [ ] studio lint não retorna ERROR
+[ ] O runtime estimado está dentro de 10% da meta, ou o aviso foi revisado
 ```
 
 ## 9. Checklist antes de editar o episódio

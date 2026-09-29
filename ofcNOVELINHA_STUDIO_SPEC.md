@@ -309,6 +309,10 @@ characters:
 
     voice\_notes: "voz suave e doce em público; baixa e fria quando está sozinha"
 
+    default\_delivery: "low, cold, controlled"
+
+    default\_delivery\_pt: "baixa, fria, controlada"
+
     bio\_pt: "Descrição em português (personalidade, falha, arco)."
 
     arc\_pt: "De X para Y."
@@ -391,6 +395,8 @@ cold\_open:
 
 cliffhanger: "Descrição do cliffhanger final."
 
+season\_finale: false
+
 key\_prop: "objeto-chave do episódio"
 
 status: generating     \# planning | scripted | prompts\_ready | generating | editing | ready | posted
@@ -399,7 +405,9 @@ metrics: {}            \# preencher após postar: views, retenção 3s, % assist
 
 notes: ""
 
-Cálculo de duração: `duração_estimada = cold_open.trim_end_s + 8 × (número de clipes de vídeo do episódio, sem contar o que foi só reaproveitado no cold open)`. O Studio compara com `target_seconds` e avisa.
+Cálculo de duração do lint: `estimated_runtime_s = soma das durações dos vídeos aprovados ou
+planejados + (cold_open.trim_end_s - cold_open.trim_start_s)`. O Studio compara com
+`target_seconds` e avisa quando a diferença passa de 10%.
 
 ### 5.6 `episodes/epNN/shots.yaml` (fonte da verdade da produção)
 
@@ -432,6 +440,16 @@ shots:
       \- speaker: duda
 
         text: "Se ele chegar perto demais... eu conto que ela tá com outro."
+
+        delivery: "low, cold, controlled"
+
+        delivery\_pt: "baixa, fria, controlada"
+
+    voice\_over\_pt: []
+
+    intentional\_silence: false
+
+    beat\_pt: "Duda transforma a ameaça em plano de chantagem."
 
     voice\_mode: native              \# native | post
 
@@ -504,6 +522,16 @@ pacing:
 
   max_intentional_silences_per_episode: 1
 
+  delivery_forbidden_markers: [" or ", ";", " when "]
+
+  enforcement:
+
+    low_fill: error
+
+    excess_silence: error
+
+    missing_hook: warning
+
 ### 5.8 `config/accounts.yaml`
 
 accounts:
@@ -552,7 +580,7 @@ Use the attached image as reference. Same characters, same faces, same clothes, 
 
 `video_from_image.j2`
 
-Animate the attached image. {{ framing }}. {{ style.video\_motion\_defaults }}: {{ action }}, {{ camera }}.{% if gaze %} Looking {{ gaze }}.{% endif %}{% for line in dialogue %} {{ "First" if loop.first else "Then" }} {{ line.speaker\_name }} says in Brazilian Portuguese{{ line.voice\_note }}: "{{ line.text }}"{% endfor %} {{ light }}, vertical 9:16, {{ duration\_s }} seconds.
+Animate the attached image. {{ framing }}. {{ style.video\_motion\_defaults }}: {{ action }}, {{ camera }}.{% if gaze %} Looking {{ gaze }}.{% endif %}{% for line in dialogue %} {{ "First" if loop.first else "Then" }} {{ line.speaker\_name }} says in Brazilian Portuguese{% if line.delivery %} ({{ line.delivery }}){% endif %}: "{{ line.text }}"{% endfor %} {{ light }}, vertical 9:16, {{ duration\_s }} seconds.
 
 ### 7.3 Exemplo de saída esperada (plano da cozinha)
 
@@ -579,6 +607,13 @@ handheld camera feel, no cuts, vertical 9:16, 8 seconds.
 - Aviso: mais de uma ação principal na `action` (heurística: mais de duas conjunções "and"/"then").  
 - Aviso: apelido usado por quem não está em `used_by`.  
 - Aviso: `video_attempts` acima de `video.max_attempts`.
+- Erro/aviso configurável: fala abaixo de `min_speech_fill` ou silêncio acima de
+  `max_silence_s`; a mensagem informa os segundos que faltam preencher.
+- Aviso: `delivery` sem `delivery_pt` (ou o inverso); erro para marcadores de tom duplo
+  configurados em `pacing.delivery_forbidden_markers`.
+- Aviso configurável: primeiro clipe/cold open sem `role: hook` ou sem fala iniciada antes de 2 s.
+- Erro: episódio sem `cliffhanger`, exceto quando `season_finale: true`.
+- Aviso: runtime estimado (vídeos mais cold open) com diferença superior a 10% da meta.
 
 ## 8\. PLANEJADOR DE CRÉDITOS E ALOCAÇÃO DE CONTAS
 
@@ -734,6 +769,17 @@ Todos os comandos devem funcionar offline, imprimir saída legível no terminal 
 - O lint avisa quando a direção está incompleta ou sem espelho bilíngue. Esta fase não muda
   créditos, contas, sessão ou publicação.
 
+**Fase 1.7 — Endurecimento de ritmo e fala**
+
+- Falas e voice-over aceitam `delivery`/`delivery_pt`; o prompt usa delivery da fala, depois o
+  `default_delivery`/`default_delivery_pt` do personagem, e nunca usa `voice_notes`.
+- Marcadores de tom duplo, preenchimento baixo e silêncio excessivo têm regras e severidades
+  configuráveis em `config/production.yaml`, com compatibilidade padrão em `warning`.
+- O lint calcula runtime com cold open, valida o gancho antes de 2 s, `cliffhanger` e
+  `season_finale`, e exibe tabela Rich por plano com resumo do episódio.
+- A fixture `revenge_republic` permanece pausada, funcional e não publicável; a série real ainda
+  não existe. Esta fase não inclui créditos, sessão, métricas ou publicação.
+
 **Fase 2 — Créditos, contas e sessão**
 
 - `credits.py`, `allocator.py`, `studio plan` (só vídeo gasta).  
@@ -841,9 +887,14 @@ Leia \`docs/SPEC.md\` antes de qualquer tarefa.
 - Episódio 1 (série `revenge_republic`): cold open (close da Duda) e cozinha já em vídeo e aprovados; imagem da sala aprovada, vídeo pendente; faltam recusa do presente, Théo e cliffhanger (ver tabela da seção 14).  
 - Apelido: Manu chama Duda de "Dudu".  
 - Qualidade: 360p aceito por custo; avaliar upscale/edição no CapCut.  
-- Fase de desenvolvimento do Studio: **Fase 1.5 — Autoria dentro do projeto**. O agente pode
-  criar briefs, YAML, roteiros e shots; `studio lint` bloqueia vídeos sem fala/voz off e registra
-  o vazio estimado. Fase atual: **1.6 — Direção de cena para geração econômica**. Fases 2+
+- A série `revenge_republic` é somente fixture funcional de testes, está com `status: paused` e
+  não será publicada. A série real ainda não existe.
+- O estilo da série real será estilizado e estranho: caricatura 3D com proporções exageradas,
+  não realista.
+- A estratégia aprovada tem duas etapas: CRESCIMENTO com vídeos curtos e baratos até a
+  qualificação; MONETIZAÇÃO com episódios acima de 60 s e resolução 1080p.
+- Fase de desenvolvimento do Studio: **Fase 1.7 — Endurecimento de ritmo e fala**. O lint
+  controla delivery único, preenchimento, silêncio, gancho, cliffhanger e runtime. Fases 2+
   continuam não implementadas.
 
 ## 17\. LIÇÕES INICIAIS (COPIAR PARA `docs/LESSONS.md`)

@@ -82,7 +82,16 @@ def _dialogue_context(
         result.append(
             {
                 "speaker_name": character.name if character else line.speaker,
-                "voice_note": character.voice_notes if character and character.voice_notes else "",
+                "delivery": (
+                    line.delivery
+                    or (character.default_delivery if character else None)
+                    or ""
+                ),
+                "delivery_pt": (
+                    line.delivery_pt
+                    or (character.default_delivery_pt if character else None)
+                    or ""
+                ),
                 "text": line.text,
             }
         )
@@ -98,6 +107,16 @@ def _voice_over_context(
         result.append(
             {
                 "speaker_name": character.name if character else line.speaker,
+                "delivery": (
+                    line.delivery
+                    or (character.default_delivery if character else None)
+                    or ""
+                ),
+                "delivery_pt": (
+                    line.delivery_pt
+                    or (character.default_delivery_pt if character else None)
+                    or ""
+                ),
                 "text": line.text,
             }
         )

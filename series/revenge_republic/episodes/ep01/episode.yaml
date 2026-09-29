@@ -10,6 +10,7 @@ cold_open:
   transition: "white flash + impact sound"
   title_card_pt: "Horas antes..."
 cliffhanger: "Duda revela ao telefone que ainda tem uma prova contra Manu."
+season_finale: false
 key_prop: "small wrapped gift"
 status: generating
 metrics: {}
