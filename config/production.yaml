@@ -1,0 +1,21 @@
+tool: google_flow
+aspect_ratio: "9:16"
+video:
+  resolution: 360p
+  default_duration_s: 8
+  duration_credits:
+    6: 5
+    8: 6
+    10: 7
+  max_attempts: 2
+image:
+  credits: 0
+accounts:
+  count: 5
+  daily_credits_per_account: 50
+  reserve_videos_per_account: 1
+workflow:
+  mode: images_first
+audio:
+  mode: native
+  external_files: false

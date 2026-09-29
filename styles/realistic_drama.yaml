@@ -1,0 +1,8 @@
+id: realistic_drama
+name: "Drama realista"
+style_block: "Realistic cinematic style, soft natural lighting, shallow depth of field, film look, vertical 9:16"
+negative_hints: "no text, no watermark, no extra fingers"
+camera_defaults: "slight handheld feel"
+video_motion_defaults: "subtle natural motion"
+notes: "Bom para drama, vingança e romance. Evitar movimento exagerado em rostos."
+character_rules: "Descrever pessoas com traços realistas e figurino simples."

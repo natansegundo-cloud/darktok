@@ -1,0 +1,11 @@
+# Session sheet — {{ episode.id }}
+
+{% for item in items %}## {{ item.shot.id }} · {{ item.shot.kind }}
+
+Attach: {{ item.reference }}
+
+```text
+{{ item.prompt }}
+```
+
+{% endfor %}

@@ -1,0 +1,13 @@
+id: series_id
+title: "New series"
+genre: ""
+audience: ""
+language: pt-BR
+aspect_ratio: "9:16"
+style: realistic_drama
+episodes_planned: 1
+episode_target_seconds: [30, 90]
+logline: ""
+synopsis: ""
+season_hook: ""
+status: planning

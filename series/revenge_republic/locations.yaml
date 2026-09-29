@@ -1,0 +1,13 @@
+locations:
+  - id: kitchen
+    name: "Cozinha da república"
+    description_en: "small student house kitchen, cluttered shelves, window on the left, worn wooden counter"
+    default_light: "late afternoon golden light"
+  - id: living_room
+    name: "Sala da república"
+    description_en: "student house living room, wooden table, newspapers and notebooks"
+    default_light: "night, warm lamp light"
+  - id: duda_bedroom
+    name: "Quarto da Duda"
+    description_en: "small student bedroom, neatly made bed, vanity mirror and warm bedside lamp"
+    default_light: "night, warm bedside lamp light"

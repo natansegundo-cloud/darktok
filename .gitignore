@@ -1,0 +1,11 @@
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.py[cod]
+*.egg-info/
+.venv/
+output/*
+!output/.gitkeep
+series/**/assets/
+series/**/export/
+series/**/edit/

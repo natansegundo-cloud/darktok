@@ -1,0 +1,195 @@
+shots:
+  - id: P01i
+    order: 0
+    kind: derived_image
+    role: hook
+    location: kitchen
+    characters: [duda]
+    framing: extreme close-up
+    action: "Duda's sweet fragile expression becomes a cold calculating smirk"
+    expected_result_pt: "Um close da Duda na cozinha, com a expressão doce mudando para um sorriso frio e calculista."
+    parent: P02i
+    status: approved
+    files:
+      image: assets/images/EP01_P01i_image.jpg
+  - id: P01
+    order: 1
+    kind: video_from_image
+    role: hook
+    location: kitchen
+    characters: [duda]
+    framing: extreme close-up
+    action: "sweet fragile expression drops into a cold calculating smirk"
+    expected_result_pt: "Um close da Duda falando baixo, olhando para o espelho fora da câmera, enquanto a câmera se aproxima lentamente."
+    camera: "very slow push-in"
+    gaze: "off-camera toward a mirror"
+    parent: P01i
+    dialogue_pt:
+      - speaker: duda
+        text: "Se ele chegar perto demais... eu conto que ela tá com outro."
+    voice_mode: native
+    duration_s: 8
+    account: conta1
+    status: approved
+    video_attempts: 1
+    files:
+      image: assets/images/EP01_P01i_image.jpg
+      video: assets/videos/EP01_P01_video.mp4
+    notes: "Usado como cold open, de 0 a 3,5 s."
+  - id: P02i
+    order: 2
+    kind: anchor_image
+    role: body
+    location: kitchen
+    characters: [manu, duda]
+    framing: wide-medium shot, keep both characters in frame
+    action_en: "Manu stands by the sink while Duda holds a thermos"
+    expected_result_pt: "Uma imagem aberta da Manu e da Duda na cozinha; Manu está perto da pia e Duda segura a garrafa térmica."
+    mood: "quiet tension"
+    status: approved
+    files:
+      image: assets/images/EP01_P02i_image.jpg
+  - id: P02
+    order: 3
+    kind: video_from_image
+    role: body
+    location: kitchen
+    characters: [manu, duda]
+    framing: wide-medium shot, keep both characters in frame
+    action: "water running from the tap, Manu slowly turning her head toward Duda, Duda's hands trembling on the thermos"
+    expected_result_pt: "As duas permanecem na cozinha; a água corre, Manu vira o rosto para Duda e elas trocam as duas falas curtas."
+    camera: "slight handheld camera feel, no cuts"
+    parent: P02i
+    dialogue_pt:
+      - speaker: duda
+        text: "Manu... você tá bem?"
+      - speaker: manu
+        text: "Tô, Dudu. Só cansada."
+    duration_s: 8
+    account: conta1
+    status: approved
+    video_attempts: 1
+    files:
+      image: assets/images/EP01_P02i_image.jpg
+      video: assets/videos/EP01_P02_video.mp4
+  - id: P03i
+    order: 4
+    kind: anchor_image
+    role: body
+    location: living_room
+    characters: [manu, duda, theo, rafa]
+    framing: medium-wide shot
+    action_en: "The four students stand around a wooden table with a small wrapped gift"
+    expected_result_pt: "Uma imagem aberta dos quatro personagens em volta da mesa da sala, com o presente embrulhado visível."
+    mood: "tense social gathering"
+    status: approved
+    files:
+      image: assets/images/EP01_P03i_image.jpg
+  - id: P03
+    order: 5
+    kind: video_from_image
+    role: body
+    location: living_room
+    characters: [manu, duda, theo, rafa]
+    framing: medium-wide shot, keep the group in frame
+    action: "Rafa stiffens and gestures toward the gift while Duda takes one step back and Théo watches her reaction"
+    expected_result_pt: "Rafa reage ao presente, Duda recua um passo e Théo observa a reação dela enquanto o grupo continua no enquadramento."
+    camera: "slow lateral move"
+    parent: P03i
+    dialogue_pt:
+      - speaker: rafa
+        text: "Você sabia que isso ia acontecer?"
+      - speaker: duda
+        text: "Eu não sei do que você tá falando."
+    duration_s: 8
+    account: conta1
+    status: approved
+    video_attempts: 1
+    files:
+      image: assets/images/EP01_P03i_image.jpg
+      video: assets/videos/EP01_P03_video.mp4
+  - id: P04i
+    order: 6
+    kind: derived_image
+    role: body
+    location: living_room
+    characters: [duda, manu]
+    framing: medium close-up
+    action: "Duda refuses the wrapped gift while Manu watches in disbelief"
+    expected_result_pt: "Um close médio de Duda recusando o presente enquanto Manu observa, surpresa e sem entender a reação."
+    parent: P03i
+    status: todo
+  - id: P04
+    order: 7
+    kind: video_from_image
+    role: body
+    location: living_room
+    characters: [duda, manu]
+    framing: medium close-up
+    action: "Duda pushes the gift away and Manu freezes"
+    expected_result_pt: "Duda empurra o presente, Manu congela e Duda diz que aquilo não deve ser aberto."
+    camera: "slow push-in"
+    parent: P04i
+    dialogue_pt:
+      - speaker: duda
+        text: "Não abre isso aqui."
+    duration_s: 8
+    account: conta1
+    status: todo
+  - id: P05i
+    order: 8
+    kind: derived_image
+    role: body
+    location: living_room
+    characters: [theo, duda]
+    framing: close two-shot
+    action: "Théo notices the relief on Duda's face"
+    expected_result_pt: "Um close de dois personagens em que Théo percebe o alívio no rosto de Duda antes que ela esconda a expressão."
+    parent: P03i
+    status: todo
+  - id: P05
+    order: 9
+    kind: video_from_image
+    role: body
+    location: living_room
+    characters: [theo, duda]
+    framing: close two-shot
+    action: "Théo leans toward Duda while her relieved smile quickly disappears"
+    expected_result_pt: "Théo se inclina para Duda, o sorriso aliviado dela desaparece e ele pergunta por que ela ficou tão aliviada."
+    camera: "subtle handheld feel"
+    parent: P05i
+    dialogue_pt:
+      - speaker: theo
+        text: "Por que você ficou tão aliviada?"
+    duration_s: 8
+    account: conta1
+    status: todo
+  - id: P06i
+    order: 10
+    kind: derived_image
+    role: cliffhanger
+    location: duda_bedroom
+    characters: [duda]
+    framing: close-up
+    action: "Duda sits alone on the bed holding a phone"
+    expected_result_pt: "Uma imagem em close da Duda sozinha na cama, segurando o celular, em um quarto escuro e tenso."
+    parent: P03i
+    status: todo
+  - id: P06
+    order: 11
+    kind: video_from_image
+    role: cliffhanger
+    location: duda_bedroom
+    characters: [duda]
+    framing: close-up
+    action: "Duda lowers her voice and looks toward the dark doorway"
+    expected_result_pt: "Um close da Duda falando em voz baixa e olhando para a porta escura enquanto a câmera se aproxima lentamente; ela revela que ainda tem a prova."
+    camera: "very slow push-in"
+    gaze: "off-camera toward the doorway"
+    parent: P06i
+    dialogue_pt:
+      - speaker: duda
+        text: "A prova ainda tá comigo."
+    duration_s: 10
+    account: conta1
+    status: todo

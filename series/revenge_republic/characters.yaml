@@ -1,0 +1,53 @@
+characters:
+  - id: manu
+    name: Manu
+    full_name: Manuela
+    role: protagonist
+    age: 20
+    lock_version: 1
+    lock_block: "Manu, 20-year-old Brazilian woman, brown skin, almond eyes, dark brown hair in a neat bun, white t-shirt and beige cardigan"
+    signature_element: "beige cardigan"
+    hair_color: brown
+    voice_notes: "gentle, tired"
+    bio_pt: "Protagonista tentando descobrir a verdade."
+    arc_pt: "De confiança ingênua para autonomia."
+  - id: duda
+    name: Duda
+    full_name: Eduarda
+    nicknames:
+      - name: Dudu
+        used_by: [manu]
+    role: villain
+    age: 20
+    lock_version: 2
+    lock_block: "Duda, 20-year-old Brazilian woman, straight blonde hair, big eyes, flawless makeup, pastel pink V-neck knit top, two thin gold necklaces, black pants"
+    signature_element: "gold necklaces"
+    hair_color: blonde
+    voice_notes: "soft and sweet in public; low and cold when alone"
+    bio_pt: "Vilã socialmente impecável e calculista."
+    arc_pt: "De controle absoluto para exposição."
+    approved_reference: shared_assets/anchors/EP01_P02_image.jpg
+  - id: theo
+    name: Théo
+    full_name: Théo Almeida
+    role: ally
+    age: 21
+    lock_version: 1
+    lock_block: "Théo, 21-year-old Brazilian man, messy dark brown hair, rectangular glasses, gray hoodie"
+    signature_element: "rectangular glasses"
+    hair_color: dark brown
+    voice_notes: "quiet and observant"
+    bio_pt: "Aliado que percebe as contradições antes dos outros."
+    arc_pt: "De espectador para aliado ativo."
+  - id: rafa
+    name: Rafa
+    full_name: Rafael
+    role: love_interest
+    age: 21
+    lock_version: 1
+    lock_block: "Rafa, 21-year-old Brazilian man, dark curly black hair, navy polo shirt, athletic build"
+    signature_element: "navy polo shirt"
+    hair_color: black
+    voice_notes: "irritated but controlled"
+    bio_pt: "Namorado de Manu, pressionado pela situação."
+    arc_pt: "De namorado defensivo para testemunha."

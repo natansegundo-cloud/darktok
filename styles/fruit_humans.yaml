@@ -1,0 +1,8 @@
+id: fruit_humans
+name: "Frutinhas humanas"
+style_block: "Whimsical anthropomorphic fruit characters, polished cinematic 3D animation, soft studio lighting, vertical 9:16"
+negative_hints: "no text, no watermark, no deformed limbs"
+camera_defaults: "gentle floating camera"
+video_motion_defaults: "clear expressive character motion"
+notes: "Preset de exemplo para histórias leves e coloridas."
+character_rules: "Manter a fruta reconhecível e expressiva."
