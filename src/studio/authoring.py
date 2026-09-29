@@ -3,17 +3,17 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from .bible import BIBLE_SECTIONS
 from .scaffold import new_episode
 
-BRIEF_SECTIONS: tuple[tuple[str, str], ...] = (
-    ("Premissa", "Qual é a premissa em uma frase?"),
-    ("Público", "Para quem esta série é feita?"),
-    ("Estilo desejado", "Qual estilo visual e tom você deseja?"),
-    ("Personagens", "Quem são os personagens e o que cada um quer?"),
-    ("Locais", "Quais locais aparecem e o que pode ser filmado neles?"),
-    ("Número de episódios", "Quantos episódios a temporada terá?"),
-    ("Gancho de temporada", "Qual pergunta ou revelação puxa a próxima etapa?"),
-    ("O que não quero", "Quais temas, imagens ou soluções devem ser evitados?"),
+BRIEF_SECTIONS: tuple[tuple[str, str], ...] = tuple(
+    (heading, f"Como você responde a esta seção? {heading}?") for heading in BIBLE_SECTIONS
+) + (
+    (
+        "Imagem mais estranha e memorável",
+        "Qual é a imagem (cena) mais estranha e memorável da série?",
+    ),
+    ("Pergunta no fim do episódio 1", "Qual pergunta o espectador faz no fim do ep 1?"),
 )
 
 
@@ -49,7 +49,7 @@ def _section_content(text: str, title: str) -> str:
     rest = text[match.end() :]
     next_heading = re.search(r"^##\s+", rest, flags=re.MULTILINE)
     content = rest[: next_heading.start()] if next_heading else rest
-    return content.strip()
+    return re.sub(r"<!--.*?-->", "", content, flags=re.DOTALL).strip()
 
 
 def check_brief(root: Path, series_id: str) -> list[str]:

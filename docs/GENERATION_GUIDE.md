@@ -46,6 +46,7 @@ Depois rode:
 
 ```text
 studio brief check revenge_republic
+studio bible check revenge_republic
 studio validate revenge_republic ep01
 studio lint revenge_republic ep01
 studio prompts revenge_republic ep01

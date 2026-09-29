@@ -29,6 +29,57 @@ def test_brief_new_and_check_commands_report_empty_sections(tmp_path: Path, monk
     assert "Premissa" in checked.stdout
 
 
+def test_bible_check_accepts_paused_fixture() -> None:
+    result = RUNNER.invoke(
+        app,
+        ["bible", "check", "revenge_republic"],
+        env={"PWD": str(ROOT)},
+    )
+    assert result.exit_code == 0
+    assert "Verificação da bíblia" in result.stdout
+    assert "OK: bible revenge_republic" in result.stdout
+
+
+def test_validate_downgrades_bible_errors_for_planning(tmp_path: Path, monkeypatch) -> None:
+    import shutil
+
+    for directory in ("config", "styles"):
+        shutil.copytree(ROOT / directory, tmp_path / directory)
+    shutil.copytree(ROOT / "series" / "revenge_republic", tmp_path / "series" / "demo")
+    series_path = tmp_path / "series" / "demo" / "series.yaml"
+    series_path.write_text(
+        series_path.read_text(encoding="utf-8").replace(
+            "id: revenge_republic", "id: demo", 1
+        ).replace("status: paused", "status: planning", 1),
+        encoding="utf-8",
+    )
+    (tmp_path / "series" / "demo" / "bible.md").write_text("# Bíblia\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = RUNNER.invoke(app, ["validate", "demo"])
+    assert result.exit_code == 0
+    assert "WARNING: Bíblia:" in result.stdout
+
+
+def test_validate_blocks_bible_errors_in_production(tmp_path: Path, monkeypatch) -> None:
+    import shutil
+
+    for directory in ("config", "styles"):
+        shutil.copytree(ROOT / directory, tmp_path / directory)
+    shutil.copytree(ROOT / "series" / "revenge_republic", tmp_path / "series" / "demo")
+    series_path = tmp_path / "series" / "demo" / "series.yaml"
+    series_path.write_text(
+        series_path.read_text(encoding="utf-8").replace(
+            "id: revenge_republic", "id: demo", 1
+        ).replace("status: paused", "status: in_production", 1),
+        encoding="utf-8",
+    )
+    (tmp_path / "series" / "demo" / "bible.md").write_text("# Bíblia\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    result = RUNNER.invoke(app, ["validate", "demo"])
+    assert result.exit_code == 1
+    assert "ERROR: Bíblia:" in result.stdout
+
+
 def test_profile_show_and_set_commands(tmp_path: Path, monkeypatch) -> None:
     import shutil
 

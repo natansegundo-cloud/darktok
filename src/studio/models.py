@@ -239,6 +239,13 @@ class PacingConfig(StudioModel):
     enforcement: PacingEnforcement = Field(default_factory=PacingEnforcement)
 
 
+class BibleConfig(StudioModel):
+    min_section_chars: int = 80
+    placeholder_markers: list[str] = Field(
+        default_factory=lambda: ["TODO", "Describe", "Descreva", "XXX"]
+    )
+
+
 class ProductionConfig(StudioModel):
     active_profile: str = "growth"
     profiles: dict[str, ProductionProfile] = Field(default_factory=dict)
@@ -249,6 +256,7 @@ class ProductionConfig(StudioModel):
     accounts: AccountsConfig = Field(default_factory=AccountsConfig)
     workflow: WorkflowConfig = Field(default_factory=WorkflowConfig)
     pacing: PacingConfig = Field(default_factory=PacingConfig)
+    bible: BibleConfig = Field(default_factory=BibleConfig)
 
     def effective_profile_name(
         self,

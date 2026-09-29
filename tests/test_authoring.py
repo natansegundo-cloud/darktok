@@ -23,6 +23,10 @@ def test_brief_new_and_check_report_empty_sections(tmp_path: Path) -> None:
     assert path.exists()
     missing = check_brief(tmp_path, "demo")
     assert missing == [title for title, _ in BRIEF_SECTIONS]
+    text = path.read_text(encoding="utf-8")
+    assert text.index(BRIEF_SECTIONS[0][0]) < text.index(BRIEF_SECTIONS[-1][0])
+    assert "Qual é a imagem (cena) mais estranha e memorável da série?" in text
+    assert "Qual pergunta o espectador faz no fim do ep 1?" in text
 
 
 def test_brief_check_accepts_filled_sections(tmp_path: Path) -> None:

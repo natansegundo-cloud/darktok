@@ -7,6 +7,7 @@ import yaml
 from rich.console import Console
 
 from .authoring import check_brief, create_brief, scaffold_episode
+from .bible import bible_table, check_bible, has_bible_errors
 from .board import next_row, write_board
 from .config import load_goals, load_production, set_active_profile
 from .loader import ProjectLoader
@@ -19,10 +20,12 @@ series_app = typer.Typer(help="Manage series.", no_args_is_help=True)
 style_app = typer.Typer(help="Manage style presets.", no_args_is_help=True)
 brief_app = typer.Typer(help="Manage Portuguese authoring briefs.", no_args_is_help=True)
 profile_app = typer.Typer(help="Manage production profiles.", no_args_is_help=True)
+bible_app = typer.Typer(help="Check series bibles.", no_args_is_help=True)
 app.add_typer(series_app, name="series")
 app.add_typer(style_app, name="style")
 app.add_typer(brief_app, name="brief")
 app.add_typer(profile_app, name="profile")
+app.add_typer(bible_app, name="bible")
 
 
 def _root() -> Path:
@@ -137,6 +140,34 @@ def brief_check(series_id: str) -> None:
     typer.echo(f"OK: brief {series_id}")
 
 
+def _print_bible_result(report, *, integration: bool = False) -> bool:
+    blocked = False
+    for issue in report.issues:
+        if issue.level == "error" and integration and report.status != "in_production":
+            prefix = "WARNING"
+        else:
+            prefix = issue.level.upper()
+        typer.echo(f"{prefix}: Bíblia: {issue.message}")
+        if issue.level == "error" and report.status == "in_production":
+            blocked = True
+    return blocked
+
+
+@bible_app.command("check")
+def bible_check(series_id: str) -> None:
+    """Check required sections, placeholders, and episode cliffhangers."""
+    try:
+        report = check_bible(_root(), series_id)
+    except Exception as exc:
+        typer.echo(f"ERROR: Bíblia: {exc}")
+        raise typer.Exit(code=1) from exc
+    _print_bible_result(report)
+    Console().print(bible_table(report))
+    if has_bible_errors(report):
+        raise typer.Exit(code=1)
+    typer.echo(f"OK: bible {series_id}")
+
+
 @app.command("scaffold")
 def scaffold(series_id: str, episode_id: str) -> None:
     """Create an episode scaffold with the complete bilingual shot schema."""
@@ -145,6 +176,9 @@ def scaffold(series_id: str, episode_id: str) -> None:
     except (FileExistsError, FileNotFoundError, ValueError) as exc:
         raise typer.BadParameter(str(exc)) from exc
     typer.echo(f"Created authoring scaffold: {path}")
+    report = check_bible(_root(), series_id)
+    if _print_bible_result(report, integration=True):
+        raise typer.Exit(code=1)
 
 
 @app.command()
@@ -164,6 +198,7 @@ def validate(
         except Exception as exc:
             typer.echo(f"ERROR: {exc}")
             raise typer.Exit(code=1) from exc
+        bible_report = check_bible(_root(), series_id)
         try:
             profile_name = production.effective_profile_name(series.profile)
             typer.echo(_profile_header(production, profile_name))
@@ -172,24 +207,33 @@ def validate(
             raise typer.Exit(code=1) from exc
         if warning := production.costs_warning():
             typer.echo(f"WARNING: {warning}")
+        bible_blocked = _print_bible_result(bible_report, integration=True)
+        if bible_report.issues:
+            Console().print(bible_table(bible_report))
+        if bible_blocked:
+            raise typer.Exit(code=1)
         typer.echo(f"OK: {series_id}")
         return
     try:
         bundle = loader.load_episode_bundle(series_id, episode_id)
         issues = validate_bundle(bundle)
         report = lint_bundle(bundle, production)
+        bible_report = check_bible(_root(), series_id)
     except Exception as exc:
         typer.echo(f"ERROR: {exc}")
         raise typer.Exit(code=1) from exc
     typer.echo(_profile_header(production, report.profile_name))
     if warning := production.costs_warning():
         typer.echo(f"WARNING: {warning}")
+    bible_blocked = _print_bible_result(bible_report, integration=True)
+    if bible_report.issues:
+        Console().print(bible_table(bible_report))
     for issue in issues:
         prefix = issue.level.upper()
         suffix = f" [{issue.shot_id}]" if issue.shot_id else ""
         typer.echo(f"{prefix}{suffix}: {issue.message}")
     Console().print(pacing_table(report))
-    if any(issue.level == "error" for issue in issues):
+    if bible_blocked or any(issue.level == "error" for issue in issues):
         raise typer.Exit(code=1)
     typer.echo(f"OK: {series_id}/{episode_id}")
 

@@ -45,6 +45,7 @@ O agente pode trabalhar dentro do projeto a partir de um brief em português:
 ```text
 studio brief new revenge_republic
 studio brief check revenge_republic
+studio bible check revenge_republic
 studio scaffold revenge_republic ep02
 studio validate revenge_republic ep01
 studio lint revenge_republic ep01
@@ -53,6 +54,11 @@ studio lint revenge_republic ep01
 `studio lint` calcula a fala estimada, o preenchimento de cada clipe, o silêncio restante,
 beats repetidos e traduções `_pt` ausentes. Consulte `docs/AUTHORING_GUIDE.md` antes de criar
 uma série ou episódio. A geração de mídia continua manual e offline.
+
+`studio bible check` verifica se a bíblia tem todas as seções obrigatórias, conteúdo suficiente,
+nenhum placeholder e uma grade completa de episódios com cliffhangers. Em séries `idea` ou
+`planning`, `validate` e `scaffold` exibem esses problemas como avisos; em `in_production`, eles
+bloqueiam a operação.
 
 O lint também valida o tom de voz: `delivery` em inglês e `delivery_pt` em português. A fala
 usa seu próprio delivery; na ausência dele, usa o `default_delivery` do personagem. `voice_notes`
@@ -78,6 +84,14 @@ de testes. Créditos, sessão, métricas e publicação continuam fora do escopo
 O episódio pode sobrescrever o perfil da série, que sobrescreve `active_profile`. O lint compara
 o runtime com a faixa do perfil e avisa quando a resolução declarada do plano diverge. Custos
 desatualizados geram aviso no `validate`; a configuração nunca inventa custo desconhecido.
+
+## Fase 1.10 — Bíblia de série verificável
+
+`templates/series/bible.md` define a estrutura da bíblia sem inventar premissa, personagens ou
+enredo. `studio bible check` valida seções, placeholders, grade de episódios e cliffhangers.
+`studio brief new` gera perguntas nessa mesma ordem e acrescenta a imagem mais estranha da série
+e a pergunta que fica no fim do episódio 1. Sessão, métricas e publicação continuam fora do
+escopo.
 
 ## Fase 1
 

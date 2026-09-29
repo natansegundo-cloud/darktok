@@ -19,3 +19,5 @@
 - O ritmo econômico precisa bloquear fala curta demais quando configurado: o lint informa quantos
   segundos faltam preencher, valida o gancho antes de 2 s, o cliffhanger e o runtime com cold open.
 - `series/revenge_republic` é apenas fixture pausada de testes; a série real ainda não existe.
+- A bíblia é contrato verificável: o template não cria conteúdo, mas exige seções completas,
+  grade com cliffhanger e nenhuma instrução de placeholder antes de uma série entrar em produção.

@@ -47,3 +47,6 @@ pacing:
     excess_silence: error
     missing_hook: warning
     profile_duration: error
+bible:
+  min_section_chars: 80
+  placeholder_markers: ["TODO", "Describe", "Descreva", "XXX"]

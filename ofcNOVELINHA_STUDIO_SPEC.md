@@ -541,6 +541,14 @@ pacing:
 
     missing_hook: warning
 
+    profile_duration: error
+
+bible:
+
+  min_section_chars: 80
+
+  placeholder_markers: ["TODO", "Describe", "Descreva", "XXX"]
+
 active_profile: growth
 
 profiles:
@@ -733,6 +741,8 @@ studio brief new \<series\>             \# cria brief_pt.md para autoria dentro 
 
 studio brief check \<series\>           \# avisa seções vazias do brief
 
+studio bible check \<series\>           \# valida a bíblia da série e a grade de episódios
+
 studio scaffold \<series\> \<episode\>    \# cria episódio com schema completo de shots
 
 studio lint \<series\> \<episode\>        \# valida ritmo, beats e espelhos _pt
@@ -823,6 +833,17 @@ Todos os comandos devem funcionar offline, imprimir saída legível no terminal 
   `config/goals.yaml` quando o arquivo existir.
 - O lint valida faixa de runtime, resolução do plano e exibe o perfil nos comandos de produção.
   Esta fase não inclui sessão, métricas ou publicação.
+
+**Fase 1.10 — Bíblia de série verificável**
+
+- `templates/series/bible.md` define cabeçalhos obrigatórios e instruções sem inventar a premissa,
+  os personagens ou o enredo da série nova.
+- `studio bible check` valida tamanho mínimo configurável, placeholders, grade de episódios e
+  cliffhangers; repetições consecutivas geram aviso. `validate` e `scaffold` tratam o resultado
+  como aviso em `idea`/`planning` e como erro bloqueante em `in_production`.
+- `studio brief new` segue as perguntas da bíblia e acrescenta a imagem mais estranha e a pergunta
+  do fim do episódio 1. A fixture pausada permanece aceita. Esta fase não inclui sessão, métricas
+  ou publicação.
 
 **Fase 2 — Créditos, contas e sessão**
 
@@ -943,7 +964,8 @@ Leia \`docs/SPEC.md\` antes de qualquer tarefa.
 - Perfil ativo: `growth`, com episódios de 20 a 45 segundos e cold open configurado.
 - Fase de desenvolvimento do Studio: **Fase 1.8 — Perfis de produção**. O lint controla
   delivery, ritmo, runtime, faixa do perfil e resolução; `studio profile show/set` gerencia o
-  perfil ativo. Fases 2+ continuam não implementadas.
+  perfil ativo. A Fase 1.10 adiciona a bíblia verificável, o check de placeholders, a grade de
+  episódios e os cliffhangers antes de produção. Fases 2+ continuam não implementadas.
 
 ## 17\. LIÇÕES INICIAIS (COPIAR PARA `docs/LESSONS.md`)
 

@@ -7,14 +7,16 @@ offline. O Google Flow continua sendo usado manualmente apenas para gerar a míd
 ## Fluxo
 
 1. Escrever um brief em `series/<id>/brief_pt.md` com `studio brief new <id>`.
-2. Transformar a premissa em `series.yaml`: título, público, estilo, logline e arco da temporada.
-3. Criar os personagens com lock blocks visuais, versões e traduções.
-4. Criar os locais com descrição filmável em inglês e espelho em português.
-5. Escolher ou criar um preset de estilo contemporâneo, sem inventar época.
-6. Escrever o roteiro do episódio em `script.md`, começando as cenas no meio da ação.
-7. Quebrar o roteiro em `shots.yaml`, dando a cada plano um beat concreto.
-8. Rodar `studio validate <serie> <episódio>` e `studio lint <serie> <episódio>`.
-9. Corrigir erros, revisar avisos importantes e só então gerar prompts para o Flow.
+2. Preencher `series/<id>/bible.md` seguindo `templates/series/bible.md` e rodar
+   `studio bible check <id>`.
+3. Transformar a premissa em `series.yaml`: título, público, estilo, logline e arco da temporada.
+4. Criar os personagens com lock blocks visuais, versões e traduções.
+5. Criar os locais com descrição filmável em inglês e espelho em português.
+6. Escolher ou criar um preset de estilo contemporâneo, sem inventar época.
+7. Escrever o roteiro do episódio em `script.md`, começando as cenas no meio da ação.
+8. Quebrar o roteiro em `shots.yaml`, dando a cada plano um beat concreto.
+9. Rodar `studio validate <serie> <episódio>` e `studio lint <serie> <episódio>`.
+10. Corrigir erros, revisar avisos importantes e só então gerar prompts para o Flow.
 
 ## Campos YAML
 
@@ -176,24 +178,20 @@ ação ou fala que o revele.
 - [ ] `studio lint` não tem ERROR; avisos foram revisados.
 - [ ] O roteiro começa as cenas no meio da ação e termina em gancho.
 
+## Gancho e retenção
+
+- [ ] Os primeiros 2 segundos têm estranheza visual e fala ou voz off.
+- [ ] A cena começa no meio da ação, sem entrada ou preparação vazia.
+- [ ] Cada episódio termina com um cliffhanger preenchido.
+- [ ] Existe um bordão ou motivo recorrente reconhecível.
+- [ ] A temporada mantém uma pergunta em aberto até a revelação final.
+- [ ] `studio bible check <serie>` passa sem ERROR antes da produção.
+
 ## Brief para copiar
 
 ```markdown
 # Brief da série
 
-## Premissa
-
-## Público
-
-## Estilo desejado
-
-## Personagens
-
-## Locais
-
-## Número de episódios
-
-## Gancho de temporada
-
-## O que não quero
+Use `studio brief new <serie>` para gerar as perguntas da bíblia na ordem correta, incluindo a
+imagem mais estranha e memorável e a pergunta do espectador no fim do episódio 1.
 ```
