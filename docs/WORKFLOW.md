@@ -9,6 +9,11 @@
 7. Ajuste o `lock_block` para refletir a imagem aprovada, incrementando `lock_version`.
 8. Rode `studio validate` e `studio prompts` novamente quando necessário.
 
+Antes de gerar vídeos, rode `studio plan <series> <episode>` para reservar custo e conta; compare
+o caso esperado com o pior caso de tentativas. Use `studio plan-day` para a capacidade diária e
+`studio session <series> <episode> [--account conta1]` para a fila manual, com imagens antes dos
+vídeos e os anexos indicados.
+
 ## Regra visual simples
 
 Um plano de imagem termina em `i`: `P03i`. O plano de vídeo usa essa imagem: `P03`.

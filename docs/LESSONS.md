@@ -1,8 +1,14 @@
 # Lessons
 
+- A capacidade por conta usa `floor(créditos_diários / custo_do_clipe) - reserva`; o planejamento
+  calcula uma tentativa esperada e o pior caso configurado. Contas são apelidos manuais, nunca
+  acessadas pela ferramenta.
+- Custos não conferidos recentemente devem ser revisados na interface do Flow. Um custo `null`
+  bloqueia o planejamento para evitar estimativas inventadas.
+- `studio plan` deve ser conferido antes dos vídeos e `studio session` organiza imagens, anexos e
+  vídeos por conta sem fazer login ou chamadas externas.
+
 - Todo clipe carrega fala ou voz off; silêncio só como golpe, no máximo 1 por episódio.
-- O board já mostra o resumo em português; `studio session` permanece na Fase 2, que não foi
-  antecipada nesta fase de autoria.
 - Um beat abstrato não basta para o modo econômico: cada vídeo precisa de estado inicial,
   ações temporizadas, reação visível, estado final, som e restrições de continuidade.
 

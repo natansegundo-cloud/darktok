@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
 import yaml
 
 from .models import AccountsFile, ProductionConfig
+
+TERMS_WARNING = (
+    "AVISO: Usar várias contas gratuitas pode violar os termos de uso da ferramenta; "
+    "o risco é do usuário."
+)
 
 
 def read_yaml(path: Path) -> dict:
@@ -21,6 +27,25 @@ def load_production(root: Path) -> ProductionConfig:
 
 def load_accounts(root: Path) -> AccountsFile:
     return AccountsFile.model_validate(read_yaml(root / "config" / "accounts.yaml"))
+
+
+def show_first_run_warning(root: Path) -> bool:
+    """Print and persist the terms warning once per local project."""
+    state_path = root / ".studio_state.json"
+    state: dict[str, object] = {}
+    if state_path.exists():
+        try:
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            state = {}
+    if state.get("terms_warning_shown") is True:
+        return False
+    state["terms_warning_shown"] = True
+    state_path.write_text(
+        json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    print(TERMS_WARNING)
+    return True
 
 
 def set_active_profile(root: Path, profile_name: str) -> Path:

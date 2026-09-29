@@ -17,6 +17,9 @@ studio lint revenge_republic ep01
 studio prompts revenge_republic ep01
 studio board revenge_republic ep01
 studio next revenge_republic ep01
+studio plan revenge_republic ep01
+studio plan-day --episodes 1
+studio session revenge_republic ep01 --account conta1
 ```
 
 O projeto usa a pasta atual como raiz. Dados ficam em YAML/Markdown e mídia fica fora do Git.
@@ -103,6 +106,25 @@ enredo. `studio bible check` valida seções, placeholders, grade de episódios 
 `studio brief new` gera perguntas nessa mesma ordem e acrescenta a imagem mais estranha da série
 e a pergunta que fica no fim do episódio 1. Sessão, métricas e publicação continuam fora do
 escopo.
+
+## Fase 2 — Créditos, contas e sessão
+
+O Studio calcula custos somente para vídeos, usando `video.costs` da resolução do perfil ativo;
+imagens usam `image.credits`. `studio plan` mostra o caso esperado, o pior caso de tentativas,
+contas sugeridas, dias e saldo. `studio plan-day` estima episódios e vídeos por dia.
+
+```text
+studio plan revenge_republic ep01
+studio plan-day --episodes 1
+studio session revenge_republic ep01 [--account conta1]
+studio next revenge_republic ep01
+```
+
+`studio session` gera uma folha Markdown offline em `episodes/<ep>/prompts/session_sheet.md`, com
+imagens primeiro, anexos, prompts, destino, conta e custo. Contas são apenas apelidos: o Studio
+nunca faz login nem automatiza o Flow. Custos `null` bloqueiam cálculos; custos antigos geram
+aviso. O aviso de termos de uso da primeira execução fica em `.studio_state.json`, ignorado pelo
+Git. Esta fase não implementa métricas nem publicação.
 
 ## Fase 1
 

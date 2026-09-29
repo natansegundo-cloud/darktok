@@ -1,11 +1,32 @@
-# Session sheet — {{ episode.id }}
+# Folha de sessão — {{ series_title }} · {{ episode_id }}
 
-{% for item in items %}## {{ item.shot.id }} · {{ item.shot.kind }}
+Perfil: {{ profile_name }} ({{ resolution }})
+Conta filtrada: {{ account_filter }}
 
-Attach: {{ item.reference }}
+> Esta folha organiza ações manuais. O Studio não acessa contas, não faz login e não gera mídia.
+
+{% for phase in ["IMAGENS", "VÍDEOS"] %}
+## {{ phase }}
+
+{% set phase_items = items | selectattr("phase", "equalto", phase) | list %}
+{% if not phase_items %}
+Nenhum plano pendente nesta etapa.
+{% else %}
+{% for item in phase_items %}
+### {{ item.shot_id }} — {{ item.what }}
+
+- O que gerar: {{ item.what }}
+- O que anexar: `{{ item.attachment }}`
+- Arquivo de destino: `{{ item.destination }}`
+- Conta: {{ item.account }}
+- Custo: {{ item.cost }} créditos
+
+Prompt para copiar:
 
 ```text
 {{ item.prompt }}
 ```
 
+{% endfor %}
+{% endif %}
 {% endfor %}

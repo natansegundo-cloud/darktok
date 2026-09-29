@@ -673,13 +673,23 @@ handheld camera feel, no cuts, vertical 9:16, 8 seconds.
 
 ## 8\. PLANEJADOR DE CRÉDITOS E ALOCAÇÃO DE CONTAS
 
-### 8.1 Cálculo (só vídeo gasta)
+### 8.1 Cálculo (só vídeo gasta; fonte: config)
 
-- Custo de plano \= `image.credits` (0) para imagens ou `video.credits` (7) para `video_from_image`.  
-- Custo de episódio \= soma dos vídeos pendentes (status diferente de `approved`).  
-- Vídeos por conta por dia \= `floor(daily_credits_per_account / video.credits)` \= 7\.  
-- Capacidade útil por conta \= vídeos por dia − `reserve_videos_per_account` \= 6\.  
-- O cold open **não custa nada**: reaproveita um clipe já aprovado.
+- Custo de imagem = `image.credits`; custo de vídeo = `video.costs[resolução_do_perfil][duração]`.
+- O custo do episódio é a soma dos vídeos pendentes. O relatório mostra uma tentativa esperada
+  e o pior caso de `video.max_attempts` tentativas por plano.
+- Vídeos por conta por dia = calculados pelo custo da duração e resolução configurados.
+- Capacidade útil por conta = `floor(daily_credits_per_account / custo_do_clipe)` menos
+  `reserve_videos_per_account`; a capacidade total é a soma das contas em `config/accounts.yaml`.
+- Custo desconhecido falha com mensagem em português. O cold open reutiliza um clipe e não cria
+  uma nova reserva de vídeo.
+
+> **Atualização da Fase 2:** os números ilustrativos acima são legados e não são fonte de
+> verdade. O custo é lido de `video.costs[resolução do perfil][duração]`; imagem usa
+> `image.credits`. A capacidade é `floor(daily_credits_per_account / custo_do_clipe)` menos
+> `reserve_videos_per_account`, somada entre as contas de `config/accounts.yaml`. O relatório
+> mostra uma tentativa esperada e o pior caso de `video.max_attempts`. Custo `null` bloqueia o
+> cálculo e exige preenchimento em `config/production.yaml`.
 
 ### 8.2 Alocador
 
@@ -773,6 +783,8 @@ studio session \<series\> \<ep\> \[--account conta1\]   \# folha de sessão: ord
 studio next \<series\> \<ep\>            \# diz qual é a próxima ação e mostra o prompt pronto
 
 studio plan \<series\> \<ep\>            \# créditos de vídeo e divisão por conta
+
+studio plan-day [--episodes N]        \# capacidade diária do perfil ativo
 
 studio mark \<series\> \<ep\> \<shot\> \<status\>
 
@@ -876,6 +888,10 @@ Todos os comandos devem funcionar offline, imprimir saída legível no terminal 
 - `session.py`, `studio session`, `studio next`.  
 - Testes com casos de estouro de capacidade e de tentativas de vídeo.
 
+**Estado da Fase 2:** concluída. O Studio calcula orçamento esperado e pior caso, aloca vídeos
+por conta/dia respeitando reservas, gera `plan-day`, cria folhas de sessão offline e faz `next`
+respeitar a reserva. Não inclui métricas nem publicação.
+
 **Fase 3 — Status e arquivos**
 
 - `studio mark`, `studio attempt`, `studio status`, `studio check-names`.  
@@ -969,6 +985,10 @@ Leia \`docs/SPEC.md\` antes de qualquer tarefa.
 \- Sem regressão nas validações da seção 7.4 da SPEC.
 
 ## 16\. ESTADO ATUAL DO PROJETO (ATUALIZAR A CADA FASE)
+
+- Fase concluída: **Fase 2 — Créditos, contas e sessão**. Créditos vêm exclusivamente do config;
+  custos `null` bloqueiam o cálculo, a alocação cobre o pior caso de tentativas e a sessão é
+  manual/offline. Métricas e publicação permanecem fora do escopo.
 
 - Ferramenta: Google Flow, 5 contas gratuitas, 50 créditos/dia cada. **Imagem é grátis; custos
   de vídeo são lidos por resolução em `config/production.yaml`**. Custos `null` permanecem sem

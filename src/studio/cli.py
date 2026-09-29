@@ -9,11 +9,13 @@ from rich.console import Console
 from .authoring import check_brief, create_brief, scaffold_episode
 from .bible import bible_table, check_bible, has_bible_errors
 from .board import next_row, write_board
-from .config import load_goals, load_production, set_active_profile
+from .config import load_goals, load_production, set_active_profile, show_first_run_warning
+from .credits import build_day_plan, build_episode_plan, plan_summary, plan_table
 from .loader import ProjectLoader
 from .pacing import lint_bundle, pacing_table
 from .prompts import validate_bundle, write_prompts
 from .scaffold import init_project, new_episode, new_series, new_style
+from .session import write_session_sheet
 
 app = typer.Typer(help="Offline production studio for vertical AI dramas.", no_args_is_help=True)
 series_app = typer.Typer(help="Manage series.", no_args_is_help=True)
@@ -32,6 +34,12 @@ def _root() -> Path:
     return Path.cwd()
 
 
+@app.callback()
+def app_callback() -> None:
+    """Show the local terms warning on the first CLI execution."""
+    show_first_run_warning(_root())
+
+
 def _profile_header(production, profile_name: str) -> str:
     profile = production.profile(profile_name)
     bounds = profile.episode_seconds
@@ -48,7 +56,7 @@ def init() -> None:
     typer.echo(f"Project ready at {_root()}")
     if created:
         typer.echo(f"Created {len(created)} paths")
-    typer.echo("Warning: using multiple free accounts may violate the generation tool's terms.")
+    show_first_run_warning(_root())
     typer.echo("Studio never logs in to accounts or automates the Flow.")
 
 
@@ -297,6 +305,87 @@ def prompts(
                 typer.echo(f"{issue.level.upper()} [{result.shot.id}]: {issue.message}")
 
 
+@app.command("plan")
+def plan(series_id: str, episode_id: str) -> None:
+    """Plan pending video credits and account allocation."""
+    show_first_run_warning(_root())
+    loader = ProjectLoader(_root())
+    try:
+        bundle = loader.load_episode_bundle(series_id, episode_id)
+        production = load_production(_root())
+        report = build_episode_plan(_root(), bundle)
+    except Exception as exc:
+        typer.echo(f"ERROR: {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(_profile_header(production, bundle.profile_name))
+    if warning := production.costs_warning():
+        typer.echo(f"WARNING: {warning}")
+    Console().print(plan_table(report))
+    for line in plan_summary(report):
+        typer.echo(line)
+    if report.worst_days > 1:
+        typer.echo(
+            "WARNING: a capacidade diária não comporta o pior caso; sugere-se dividir em dias."
+        )
+
+
+@app.command("plan-day")
+def plan_day(episodes: int | None = typer.Option(None, "--episodes", min=1)) -> None:
+    """Estimate episodes and videos per day for the active profile."""
+    show_first_run_warning(_root())
+    try:
+        production = load_production(_root())
+        report = build_day_plan(_root(), requested_episodes=episodes)
+    except Exception as exc:
+        typer.echo(f"ERROR: {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(_profile_header(production, report.profile_name))
+    if warning := production.costs_warning():
+        typer.echo(f"WARNING: {warning}")
+    typer.echo(
+        f"Tamanho médio do episódio: {report.average_episode_seconds:.1f}s; "
+        f"clipe médio real: {report.average_clip_seconds:.1f}s; "
+        f"{report.videos_per_episode} vídeos/episódio."
+    )
+    typer.echo(
+        f"Esperado: {report.expected_episodes_per_day} episódios/dia; "
+        f"{report.expected_videos_per_day} vídeos/dia; "
+        f"{report.expected_episode_credits} créditos/episódio."
+    )
+    typer.echo(
+        f"Pior caso: {report.worst_episodes_per_day} episódios/dia; "
+        f"{report.worst_videos_per_day} vídeos/dia; "
+        f"{report.worst_episode_credits} créditos/episódio."
+    )
+    if episodes is not None:
+        typer.echo(
+            f"{episodes} episódios solicitados cabem no dia? "
+            f"esperado: {'sim' if report.requested_expected_fits else 'não'}; "
+            f"pior caso: {'sim' if report.requested_worst_fits else 'não'}."
+        )
+
+
+@app.command("session")
+def session(
+    series_id: str,
+    episode_id: str,
+    account: str | None = typer.Option(None, "--account"),
+) -> None:
+    """Generate an offline production session sheet."""
+    show_first_run_warning(_root())
+    loader = ProjectLoader(_root())
+    try:
+        bundle = loader.load_episode_bundle(series_id, episode_id)
+        target = write_session_sheet(_root(), bundle, account=account)
+        production = load_production(_root())
+    except Exception as exc:
+        typer.echo(f"ERROR: {exc}")
+        raise typer.Exit(code=1) from exc
+    if warning := production.costs_warning():
+        typer.echo(f"WARNING: {warning}")
+    typer.echo(f"Session sheet written to {target}")
+
+
 @app.command()
 def board(series_id: str, episode_id: str) -> None:
     """Write and display the visual production board for an episode."""
@@ -314,6 +403,7 @@ def board(series_id: str, episode_id: str) -> None:
 @app.command()
 def next(series_id: str, episode_id: str) -> None:
     """Show the next safe production action and its prompt."""
+    show_first_run_warning(_root())
     loader = ProjectLoader(_root())
     try:
         bundle = loader.load_episode_bundle(series_id, episode_id)
@@ -328,6 +418,20 @@ def next(series_id: str, episode_id: str) -> None:
         return
     typer.echo(f"Próxima ação: {row.next_action}")
     typer.echo(f"Plano: {row.shot_id} · Etapa: {row.stage} · Prompt: {row.prompt_file}")
+    if row.stage == "VIDEO":
+        try:
+            budget = build_episode_plan(_root(), bundle)
+        except Exception as exc:
+            typer.echo(f"ERROR: orçamento: {exc}")
+            raise typer.Exit(code=1) from exc
+        assignment = budget.assignment_for(row.shot_id)
+        if assignment is None:
+            typer.echo("WARNING: não há capacidade reservada para este vídeo.")
+            return
+        typer.echo(
+            f"Orçamento reservado: {assignment.account_id}, dia {assignment.day} "
+            "(pior caso)."
+        )
     can_generate = (row.stage == "IMAGE" and "Gerar imagem" in row.next_action) or (
         row.stage == "VIDEO" and "gerar vídeo" in row.next_action
     )

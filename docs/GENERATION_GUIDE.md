@@ -66,6 +66,11 @@ duração do episódio. `studio profile set monetize` só seleciona a configura�
 de 1080p precisam ser preenchidos manualmente em `config/production.yaml` antes de qualquer
 comando que calcule custo.
 
+Antes de gerar vídeos, rode `studio plan <series> <episode>` para conferir conta, dias e o
+orçamento esperado/pior caso. `studio plan-day --episodes 1` mostra a capacidade diária do perfil
+ativo. Depois, `studio session <series> <episode> [--account conta1]` gera a folha offline, com
+imagens primeiro e vídeos depois. O Studio não acessa contas nem faz login.
+
 ## 3. Gerar uma imagem
 
 1. Abra o documento da cena, por exemplo `prompts/P03.md`, e procure a seção `IMAGEM:`.
@@ -171,6 +176,8 @@ manda gerar/aprovar a imagem primeiro.
 [ ] Há no máximo duas falas curtas
 [ ] A duração está correta
 [ ] O custo foi conferido no cabeçalho do prompt
+[ ] `studio plan` foi conferido; o pior caso cabe na capacidade ou foi dividido em dias
+[ ] `studio session` foi gerado para a conta correta
 ```
 
 ## 8. Checklist de ritmo antes de gerar o vídeo
