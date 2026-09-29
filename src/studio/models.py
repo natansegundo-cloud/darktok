@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import date
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -81,6 +82,7 @@ class Series(StudioModel):
     synopsis: str = ""
     season_hook: str = ""
     status: Literal["idea", "planning", "in_production", "paused", "released"] = "planning"
+    profile: str | None = None
     notes: str = ""
 
 
@@ -101,6 +103,7 @@ class Episode(StudioModel):
     cold_open: ColdOpen = Field(default_factory=ColdOpen)
     cliffhanger: str = ""
     season_finale: bool = False
+    profile: str | None = None
     key_prop: str = ""
     status: Literal[
         "planning", "scripted", "prompts_ready", "generating", "editing", "ready", "posted"
@@ -152,6 +155,7 @@ class Shot(StudioModel):
     reference_from: str | None = None
     light: str | None = None
     light_pt: str = ""
+    resolution: str | None = None
     dialogue_pt: list[DialogueLine] = Field(default_factory=list)
     voice_over_pt: list[DialogueLine] = Field(default_factory=list)
     intentional_silence: bool = False
@@ -182,10 +186,23 @@ class ShotsFile(StudioModel):
 
 
 class VideoConfig(StudioModel):
-    resolution: str = "360p"
     default_duration_s: int = 8
-    duration_credits: dict[int, int] = Field(default_factory=lambda: {6: 5, 8: 6, 10: 7})
+    costs_verified_on: date | None = None
+    costs_max_age_days: int = 30
+    costs: dict[str, dict[int, int | None]] = Field(default_factory=dict)
     max_attempts: int = 2
+
+
+class EpisodeSeconds(StudioModel):
+    min: int
+    max: int
+
+
+class ProductionProfile(StudioModel):
+    purpose_pt: str
+    resolution: str
+    episode_seconds: EpisodeSeconds
+    cold_open: bool = True
 
 
 class ImageConfig(StudioModel):
@@ -206,6 +223,7 @@ class PacingEnforcement(StudioModel):
     low_fill: Literal["error", "warning"] = "warning"
     excess_silence: Literal["error", "warning"] = "warning"
     missing_hook: Literal["error", "warning"] = "warning"
+    profile_duration: Literal["error", "warning"] = "error"
 
 
 class PacingConfig(StudioModel):
@@ -222,6 +240,8 @@ class PacingConfig(StudioModel):
 
 
 class ProductionConfig(StudioModel):
+    active_profile: str = "growth"
+    profiles: dict[str, ProductionProfile] = Field(default_factory=dict)
     tool: str = "google_flow"
     aspect_ratio: str = "9:16"
     video: VideoConfig = Field(default_factory=VideoConfig)
@@ -230,17 +250,53 @@ class ProductionConfig(StudioModel):
     workflow: WorkflowConfig = Field(default_factory=WorkflowConfig)
     pacing: PacingConfig = Field(default_factory=PacingConfig)
 
-    def video_credits(self, duration_s: int) -> int:
-        try:
-            return self.video.duration_credits[duration_s]
-        except KeyError as exc:
-            supported = ", ".join(str(value) for value in sorted(self.video.duration_credits))
-            raise ValueError(f"Unsupported video duration {duration_s}s; use: {supported}") from exc
+    def effective_profile_name(
+        self,
+        series_profile: str | None = None,
+        episode_profile: str | None = None,
+    ) -> str:
+        name = episode_profile or series_profile or self.active_profile
+        if name not in self.profiles:
+            raise ValueError(
+                f"Perfil '{name}' não está configurado em config/production.yaml"
+            )
+        return name
 
-    def shot_credits(self, shot: Shot) -> int:
+    def profile(self, name: str | None = None) -> ProductionProfile:
+        profile_name = name or self.active_profile
+        try:
+            return self.profiles[profile_name]
+        except KeyError as exc:
+            raise ValueError(
+                f"Perfil '{profile_name}' não está configurado em config/production.yaml"
+            ) from exc
+
+    def video_credits(self, duration_s: int, resolution: str | None = None) -> int:
+        selected_resolution = resolution or self.profile().resolution
+        resolution_costs = self.video.costs.get(selected_resolution)
+        if resolution_costs is None or duration_s not in resolution_costs:
+            raise ValueError(
+                f"Preencha o custo de {selected_resolution} em config/production.yaml"
+            )
+        cost = resolution_costs[duration_s]
+        if cost is None:
+            raise ValueError(
+                f"Preencha o custo de {selected_resolution} em config/production.yaml"
+            )
+        return cost
+
+    def shot_credits(self, shot: Shot, resolution: str | None = None) -> int:
         if shot.kind in {"anchor_image", "derived_image"}:
             return self.image.credits
-        return self.video_credits(shot.duration_s)
+        return self.video_credits(shot.duration_s, resolution=resolution)
+
+    def costs_warning(self) -> str | None:
+        if self.video.costs_verified_on is None:
+            return "Conferir custos na interface do Flow: eles mudam"
+        age = (date.today() - self.video.costs_verified_on).days
+        if age > self.video.costs_max_age_days:
+            return "Conferir custos na interface do Flow: eles mudam"
+        return None
 
 
 class Account(StudioModel):

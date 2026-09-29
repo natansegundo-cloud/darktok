@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from .config import read_yaml
+from .config import load_production, read_yaml
 from .models import (
     CharactersFile,
     Episode,
@@ -24,6 +24,7 @@ class LoadedEpisode:
     shots: ShotsFile
     series_dir: Path
     episode_dir: Path
+    profile_name: str = ""
 
 
 class ProjectLoader:
@@ -64,13 +65,17 @@ class ProjectLoader:
         series = self.load_series(series_id)
         series_dir = self.series_dir(series_id)
         episode_dir = self.episode_dir(series_id, episode_id)
+        episode = self.load_episode(series_id, episode_id)
+        production = load_production(self.root)
+        profile_name = production.effective_profile_name(series.profile, episode.profile)
         return LoadedEpisode(
             series=series,
             characters=self.load_characters(series_id),
             locations=self.load_locations(series_id),
             style=self.load_style(series),
-            episode=self.load_episode(series_id, episode_id),
+            episode=episode,
             shots=self.load_shots(series_id, episode_id),
             series_dir=series_dir,
             episode_dir=episode_dir,
+            profile_name=profile_name,
         )

@@ -21,6 +21,7 @@ def test_board_makes_missing_media_visible() -> None:
     assert "MISSING" in board
     assert "P03i" in board
     assert "Resumos em português" in board
+    assert "Perfil: growth (360p)" in board
 
 
 def test_next_blocks_video_until_parent_image_file_exists() -> None:

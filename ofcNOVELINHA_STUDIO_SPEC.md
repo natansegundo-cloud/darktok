@@ -4,7 +4,8 @@
 
 **Mudanças da v1.0 para a v1.1 (aprendidas em produção real):**
 
-- Geração de **imagem é gratuita** no Flow; **só vídeo gasta créditos** (7 créditos por clipe de 8 s em 360p). Todo o planejador de créditos foi refeito em cima disso.  
+- Geração de **imagem é gratuita** no Flow; **só vídeo gasta créditos**. Custos por resolução e
+  duração vêm exclusivamente de `config/production.yaml`.
 - Novo conceito de **cold open** (teaser de abertura de \~3 s reaproveitado de um clipe já gerado, custo zero) com transição.  
 - Novo **modo de ritmo de produção**: imagens em lote primeiro (grátis, com várias tentativas) e vídeos depois, ou sequencial plano a plano.  
 - **Apelidos de personagem** (ex.: a Manu chama Duda de "Dudu") e regra "o lock\_block segue a imagem aprovada".  
@@ -62,12 +63,12 @@ Valores atuais informados pelo usuário (devem ser configuráveis, nunca hardcod
 | :---- | :---- | :---- |
 | Ferramenta de geração | Google Flow | modelo mais recente |
 | Formato | 9:16 vertical |  |
-| Resolução de vídeo | 360p | escolhida por custo; visual inferior a 720p, aceito |
-| Duração de clipe de vídeo | 8 segundos |  |
-| Custo de vídeo (8 s, 360p) | 7 créditos |  |
+| Resolução de vídeo | perfil ativo | escolhida pelo perfil em `config/production.yaml` |
+| Duração de clipe de vídeo | `video.default_duration_s` |  |
+| Custo de vídeo | `config/production.yaml` | `null` significa custo desconhecido |
 | Custo de imagem | **0 créditos** | geração de imagem é gratuita |
 | Créditos por conta por dia | 50 |  |
-| Vídeos por conta por dia | 7 (49 créditos) | `floor(50 / 7)` |
+| Vídeos por conta por dia | calculado pelo config | futuro planner usa custos conhecidos |
 | Número de contas | 5 |  |
 | Vídeos por dia (todas as contas) | 35 |  |
 | Reserva de segurança | 1 vídeo por conta | para retentativa |
@@ -275,6 +276,8 @@ season\_hook: "Gancho da próxima temporada."
 
 status: in\_production           \# idea | planning | in\_production | paused | released
 
+profile: null                    \# sobrescreve active_profile quando preenchido
+
 ### 5.2 `characters.yaml`
 
 characters:
@@ -397,6 +400,8 @@ cliffhanger: "Descrição do cliffhanger final."
 
 season\_finale: false
 
+profile: null                    \# sobrescreve o perfil da série
+
 key\_prop: "objeto-chave do episódio"
 
 status: generating     \# planning | scripted | prompts\_ready | generating | editing | ready | posted
@@ -484,11 +489,15 @@ aspect\_ratio: "9:16"
 
 video:
 
-  resolution: 360p
+  costs_verified_on: null
 
-  duration\_s: 8
+  costs_max_age_days: 30
 
-  credits: 7
+  costs:
+
+    360p: {6: 5, 8: 6, 10: 7}
+
+    1080p: {6: null, 8: null, 10: null}
 
   max\_attempts: 2
 
@@ -531,6 +540,30 @@ pacing:
     excess_silence: error
 
     missing_hook: warning
+
+active_profile: growth
+
+profiles:
+
+  growth:
+
+    purpose_pt: "Ganhar seguidores e views rápido com muitos episódios curtos e baratos."
+
+    resolution: 360p
+
+    episode_seconds: {min: 20, max: 45}
+
+    cold_open: true
+
+  monetize:
+
+    purpose_pt: "Episódios longos e de maior qualidade para o programa de recompensas."
+
+    resolution: 1080p
+
+    episode_seconds: {min: 61, max: 180}
+
+    cold_open: true
 
 ### 5.8 `config/accounts.yaml`
 
@@ -586,7 +619,7 @@ Animate the attached image. {{ framing }}. {{ style.video\_motion\_defaults }}: 
 
 \# EP01 · P02 · video\_from\_image · body
 
-Conta sugerida: conta1 · Custo: 7 créditos · Anexar: assets/images/EP01\_P02\_image.jpg
+Conta sugerida: conta1 · Custo conforme `config/production.yaml` · Anexar: assets/images/EP01\_P02\_image.jpg
 
 Animate the attached image. Wide-medium shot, keep both characters in frame. Subtle natural
 
@@ -636,15 +669,15 @@ Entrada: lista de vídeos pendentes \+ contas. Regras:
 
 Exemplo de relatório esperado (`studio plan revenge_republic ep01`):
 
-Episódio ep01 · 4 vídeos pendentes · 28 créditos
+Episódio ep01 · 4 vídeos pendentes · custo conforme `config/production.yaml`
 
-conta1 · 4 vídeos (28) / 42 úteis
+conta1 · 4 vídeos (custo conforme config) / capacidade configurada
 
 Anexar na conta1: EP01\_P03\_image.jpg, EP01\_P04\_image.jpg, EP01\_P05\_image.jpg, EP01\_P06\_image.jpg
 
 Vídeos já aprovados: P01 (cold open), P02 (cozinha)
 
-Duração estimada do episódio: 3,5 s (cold open) \+ 6 clipes de 8 s \= 51,5 s
+Duração estimada do episódio: calculada pelo lint a partir dos vídeos e do cold open
 
 ## 9\. CONVENÇÕES DE NOMES E CONSISTÊNCIA ENTRE CONTAS
 
@@ -780,6 +813,17 @@ Todos os comandos devem funcionar offline, imprimir saída legível no terminal 
 - A fixture `revenge_republic` permanece pausada, funcional e não publicável; a série real ainda
   não existe. Esta fase não inclui créditos, sessão, métricas ou publicação.
 
+**Fase 1.8 — Perfis de produção**
+
+- `active_profile`, `profiles.growth` e `profiles.monetize` definem objetivo, resolução, faixa de
+  duração e cold open; episódio sobrescreve série, que sobrescreve o perfil ativo.
+- Custos ficam em `video.costs` por resolução. `null` bloqueia qualquer cálculo de custo e custos
+  sem conferência recente geram aviso no `studio validate`.
+- `studio profile show/set` consulta e altera o perfil ativo; ao selecionar `monetize`, mostra
+  `config/goals.yaml` quando o arquivo existir.
+- O lint valida faixa de runtime, resolução do plano e exibe o perfil nos comandos de produção.
+  Esta fase não inclui sessão, métricas ou publicação.
+
 **Fase 2 — Créditos, contas e sessão**
 
 - `credits.py`, `allocator.py`, `studio plan` (só vídeo gasta).  
@@ -820,18 +864,18 @@ Serve de teste real e de fixture do MVP.
 | Plano | Tipo | Conteúdo | Status |
 | :---- | :---- | :---- | :---- |
 | P01i | derived\_image | close da Duda, sorriso frio (a partir da cozinha) | aprovada |
-| P01 | video\_from\_image | close da Duda com a fala do gancho, 8 s | **aprovado** (vira o cold open, 0 a 3,5 s) |
+| P01 | video\_from\_image | close da Duda com a fala do gancho, 8 s | **aprovado** (vira o cold open, 0 a 3,0 s) |
 | P02i | anchor\_image | cozinha, Manu \+ Duda | aprovada |
 | P02 | video\_from\_image | cozinha, "Manu... você tá bem?" / "Tô, Dudu. Só cansada." | **aprovado** |
 | P03i | anchor\_image | sala com Rafa, Duda, Théo e Manu com o presente | aprovada |
-| P03 | video\_from\_image | sala, Rafa irritado, Duda defensiva, Théo desconfiado | **pendente** (7 créditos) |
+| P03 | video\_from\_image | sala, Rafa irritado, Duda defensiva, Théo desconfiado | **pendente** (custo conforme config) |
 | P04i / P04 | derived\_image \+ vídeo | Duda recusa o presente (momento mais forte) | pendente |
 | P05i / P05 | derived\_image \+ vídeo | Théo vê o alívio de Duda | pendente |
 | P06i / P06 | derived\_image \+ vídeo | Duda sozinha na cama ao telefone (cliffhanger) | pendente |
 | — | (cortado) | Théo confronta Rafa no corredor da faculdade | cortado para economizar crédito; contar com fala no CapCut |
 
-- Créditos restantes do episódio: 4 vídeos × 7 \= **28 créditos**, cabem em uma conta (7 vídeos por dia).  
-- Duração estimada: 3,5 s (cold open) \+ 5 clipes de 8 s \= **43,5 s** (dentro da meta de 30 a 90 s; pode chegar a \~52 s se o corredor entrar).  
+- Créditos restantes do episódio: calculados somente com custos conhecidos em `config/production.yaml`.
+- Duração estimada: calculada pelo lint e comparada à faixa do perfil ativo.
 - Fonte de referência de estrutura: 4 episódios de um drama chinês de "amiga falsa" (guardar em `references/`), usados para extrair ritmo e ganchos, não para copiar a história.
 
 ## 15\. AGENTS.md (COPIAR PARA A RAIZ DO REPOSITÓRIO)
@@ -880,22 +924,26 @@ Leia \`docs/SPEC.md\` antes de qualquer tarefa.
 
 ## 16\. ESTADO ATUAL DO PROJETO (ATUALIZAR A CADA FASE)
 
-- Ferramenta: Google Flow, 5 contas gratuitas, 50 créditos/dia cada. **Imagem é grátis; vídeo de 8 s em 360p custa 7 créditos** (7 vídeos por conta por dia).  
+- Ferramenta: Google Flow, 5 contas gratuitas, 50 créditos/dia cada. **Imagem é grátis; custos
+  de vídeo são lidos por resolução em `config/production.yaml`**. Custos `null` permanecem sem
+  estimativa até conferência humana no Flow.
 - Estratégia de consistência aprovada e validada em produção: sem fichas de personagem nem cenários vazios; cada imagem já sai com os personagens dentro do cenário; novas imagens usam a anterior como referência; blocos de personagem copiados literalmente; o `lock_block` acompanha o que a imagem aprovada realmente mostra.  
 - Formato de abertura aprovado: **cold open** de \~3 s com o momento de maior impacto, transição e depois o episódio normal.  
 - Ritmo de produção: a definir na prática (`images_first` recomendado; `sequential` é a alternativa). Registrar em `LESSONS.md` qual funciona melhor.  
 - Episódio 1 (série `revenge_republic`): cold open (close da Duda) e cozinha já em vídeo e aprovados; imagem da sala aprovada, vídeo pendente; faltam recusa do presente, Théo e cliffhanger (ver tabela da seção 14).  
 - Apelido: Manu chama Duda de "Dudu".  
-- Qualidade: 360p aceito por custo; avaliar upscale/edição no CapCut.  
+- Qualidade: o perfil `growth` usa 360p e o perfil `monetize` usa 1080p; custos de 1080p ainda
+  precisam ser conferidos na interface do Flow.
 - A série `revenge_republic` é somente fixture funcional de testes, está com `status: paused` e
   não será publicada. A série real ainda não existe.
 - O estilo da série real será estilizado e estranho: caricatura 3D com proporções exageradas,
   não realista.
 - A estratégia aprovada tem duas etapas: CRESCIMENTO com vídeos curtos e baratos até a
   qualificação; MONETIZAÇÃO com episódios acima de 60 s e resolução 1080p.
-- Fase de desenvolvimento do Studio: **Fase 1.7 — Endurecimento de ritmo e fala**. O lint
-  controla delivery único, preenchimento, silêncio, gancho, cliffhanger e runtime. Fases 2+
-  continuam não implementadas.
+- Perfil ativo: `growth`, com episódios de 20 a 45 segundos e cold open configurado.
+- Fase de desenvolvimento do Studio: **Fase 1.8 — Perfis de produção**. O lint controla
+  delivery, ritmo, runtime, faixa do perfil e resolução; `studio profile show/set` gerencia o
+  perfil ativo. Fases 2+ continuam não implementadas.
 
 ## 17\. LIÇÕES INICIAIS (COPIAR PARA `docs/LESSONS.md`)
 

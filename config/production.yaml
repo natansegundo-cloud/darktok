@@ -1,12 +1,24 @@
+active_profile: growth
+profiles:
+  growth:
+    purpose_pt: "Ganhar seguidores e views rápido com muitos episódios curtos e baratos."
+    resolution: 360p
+    episode_seconds: {min: 20, max: 45}
+    cold_open: true
+  monetize:
+    purpose_pt: "Episódios longos e de maior qualidade para o programa de recompensas."
+    resolution: 1080p
+    episode_seconds: {min: 61, max: 180}
+    cold_open: true
 tool: google_flow
 aspect_ratio: "9:16"
 video:
-  resolution: 360p
   default_duration_s: 8
-  duration_credits:
-    6: 5
-    8: 6
-    10: 7
+  costs_verified_on: null
+  costs_max_age_days: 30
+  costs:
+    360p: {6: 5, 8: 6, 10: 7}
+    1080p: {6: null, 8: null, 10: null}
   max_attempts: 2
 image:
   credits: 0
@@ -34,3 +46,4 @@ pacing:
     low_fill: error
     excess_silence: error
     missing_hook: warning
+    profile_duration: error

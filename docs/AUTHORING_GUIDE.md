@@ -55,6 +55,7 @@ Campos de estilo seguem a mesma regra: `style_block_pt`, `negative_hints_pt`,
 
 `id` identifica a pasta; `title` é o nome público; `genre` e `audience` orientam o recorte;
 `language` normalmente é `pt-BR`; `aspect_ratio` é `9:16`; `style` aponta para `styles/<id>.yaml`;
+`profile` é opcional e sobrescreve o perfil ativo da produção;
 `episodes_planned` e `episode_target_seconds` definem o tamanho; `logline`, `synopsis` e
 `season_hook` guardam a história; `status` pode ser `idea`, `planning`, `in_production`, `paused`
 ou `released`.
@@ -90,7 +91,8 @@ Preencha `id`, `name`, `style_block`/`style_block_pt`, `negative_hints`/`negativ
 
 ### `episode.yaml`
 
-Use `id`, `title`, `number`, `target_seconds`, `status`, `cliffhanger`, `key_prop` e `notes`.
+Use `id`, `title`, `number`, `target_seconds`, `status`, `cliffhanger`, `key_prop`, `profile` e
+`notes`. `profile` sobrescreve o perfil da série; a série sobrescreve `active_profile`.
 Em `cold_open`, marque `enabled`, `source_shot`, `trim_start_s`, `trim_end_s`, `transition` e
 `title_card_pt`. O cold open é reaproveitamento de um clipe, não um novo gasto de vídeo.
 

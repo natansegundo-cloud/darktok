@@ -11,6 +11,7 @@ cold_open:
   title_card_pt: "Horas antes..."
 cliffhanger: ""
 season_finale: false
+profile: null
 key_prop: ""
 status: planning
 metrics: {}

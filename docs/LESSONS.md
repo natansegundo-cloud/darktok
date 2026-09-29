@@ -9,8 +9,10 @@
 - Imagens derivadas devem começar com a instrução de referência para preservar rosto, cabelo,
   roupa, sala e iluminação.
 - O `lock_block` deve acompanhar exatamente a imagem aprovada e ser copiado literalmente.
-- Imagem é gratuita; vídeos em 360p custam 5 créditos (6 s), 6 créditos (8 s) ou 7 créditos
-  (10 s), conforme `config/production.yaml`.
+- Imagem é gratuita; todos os custos de vídeo, por resolução e duração, vêm exclusivamente de
+  `config/production.yaml`. Custo `null` é desconhecido e deve bloquear o cálculo.
+- Perfil de produção segue a precedência episódio → série → `active_profile`; a resolução e a
+  faixa de duração devem ser verificadas antes de gerar mídia.
 - `voice_notes` pode registrar contexto de autoria, mas nunca deve virar instrução no prompt:
   use `delivery` da fala e, como fallback, um único `default_delivery` do personagem; mantenha
   sempre o espelho `_pt`.

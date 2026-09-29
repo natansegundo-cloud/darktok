@@ -60,6 +60,11 @@ preenchimento, silêncio excessivo, delivery contraditório ou gancho antes de g
 No prompt de vídeo, confira também a sequência `Scene setup` → `Starting state` → `Timed
 direction` → `End state`. Ela é a direção para o modelo econômico, não um resumo opcional.
 
+Antes de gerar, confira `studio profile show`. O perfil ativo define a resolução e a faixa de
+duração do episódio. `studio profile set monetize` só seleciona a configuração; custos `null`
+de 1080p precisam ser preenchidos manualmente em `config/production.yaml` antes de qualquer
+comando que calcule custo.
+
 ## 3. Gerar uma imagem
 
 1. Abra o documento da cena, por exemplo `prompts/P03.md`, e procure a seção `IMAGEM:`.

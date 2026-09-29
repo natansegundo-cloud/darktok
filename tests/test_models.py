@@ -1,4 +1,9 @@
+import shutil
+from datetime import date, timedelta
 from pathlib import Path
+
+import pytest
+import yaml
 
 from studio.config import load_production
 from studio.loader import ProjectLoader
@@ -12,6 +17,25 @@ def test_video_costs_are_configured_by_duration() -> None:
     assert config.video_credits(6) == 5
     assert config.video_credits(8) == 6
     assert config.video_credits(10) == 7
+
+
+def test_profiles_and_unknown_resolution_cost_are_configured() -> None:
+    config = load_production(ROOT)
+    assert config.active_profile == "growth"
+    assert config.profile("growth").resolution == "360p"
+    assert config.profile("monetize").episode_seconds.min == 61
+    with pytest.raises(ValueError, match="Preencha o custo de 1080p"):
+        config.video_credits(8, resolution="1080p")
+
+
+def test_stale_cost_verification_warns() -> None:
+    config = load_production(ROOT)
+    stale_video = config.video.model_copy(
+        update={"costs_verified_on": date.today() - timedelta(days=31)}
+    )
+    stale = config.model_copy(update={"video": stale_video})
+    assert stale.costs_warning() == "Conferir custos na interface do Flow: eles mudam"
+    assert config.costs_warning() == "Conferir custos na interface do Flow: eles mudam"
 
 
 def test_example_bundle_loads() -> None:
@@ -53,3 +77,35 @@ def test_example_video_has_timed_direction() -> None:
     assert shot.end_state_pt
     assert shot.sound_pt
     assert shot.must_not_pt
+
+
+def test_profile_precedence_episode_then_series_then_config(tmp_path: Path) -> None:
+    for directory in ("config", "series", "styles"):
+        shutil.copytree(ROOT / directory, tmp_path / directory)
+    series_path = tmp_path / "series" / "revenge_republic" / "series.yaml"
+    episode_path = (
+        tmp_path / "series" / "revenge_republic" / "episodes" / "ep01" / "episode.yaml"
+    )
+    series_data = yaml.safe_load(series_path.read_text(encoding="utf-8"))
+    episode_data = yaml.safe_load(episode_path.read_text(encoding="utf-8"))
+    series_data["profile"] = "monetize"
+    episode_data["profile"] = "growth"
+    series_path.write_text(
+        yaml.safe_dump(series_data, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    )
+    episode_path.write_text(
+        yaml.safe_dump(episode_data, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    )
+
+    loader = ProjectLoader(tmp_path)
+    assert loader.load_episode_bundle("revenge_republic", "ep01").profile_name == "growth"
+    episode_data["profile"] = None
+    episode_path.write_text(
+        yaml.safe_dump(episode_data, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    )
+    assert loader.load_episode_bundle("revenge_republic", "ep01").profile_name == "monetize"
+    series_data["profile"] = None
+    series_path.write_text(
+        yaml.safe_dump(series_data, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    )
+    assert loader.load_episode_bundle("revenge_republic", "ep01").profile_name == "growth"

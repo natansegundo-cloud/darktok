@@ -28,6 +28,8 @@ class PacingReport:
     issues: list[ValidationIssue]
     estimated_runtime_s: float = 0.0
     target_seconds: float = 0.0
+    profile_name: str = ""
+    profile_resolution: str = ""
 
 
 def count_words(text: str) -> int:
@@ -250,6 +252,15 @@ def lint_bundle(bundle: LoadedEpisode, production: ProductionConfig) -> PacingRe
     intentional_count = 0
     characters = {item.id: item for item in bundle.characters.characters}
     issues.extend(_character_delivery_issues(characters, config.delivery_forbidden_markers))
+    profile_name = bundle.episode.profile or bundle.series.profile or production.active_profile
+    profile = production.profiles.get(profile_name)
+    if production.profiles and profile is None:
+        issues.append(
+            _issue(
+                "error",
+                f"Perfil '{profile_name}' não está configurado em config/production.yaml",
+            )
+        )
 
     for shot in ordered:
         words = shot_words(shot)
@@ -282,6 +293,15 @@ def lint_bundle(bundle: LoadedEpisode, production: ProductionConfig) -> PacingRe
         issues.extend(_direction_issues(shot))
         lines = [*shot.dialogue_pt, *shot.voice_over_pt]
         issues.extend(_delivery_issues_for_lines(shot, config.delivery_forbidden_markers))
+        if profile and shot.resolution and shot.resolution != profile.resolution:
+            issues.append(
+                _issue(
+                    "warning",
+                    f"Resolução do plano ({shot.resolution}) difere do perfil "
+                    f"{profile_name} ({profile.resolution})",
+                    shot.id,
+                )
+            )
         if not lines and not shot.intentional_silence:
             issues.append(
                 _issue(
@@ -373,18 +393,33 @@ def lint_bundle(bundle: LoadedEpisode, production: ProductionConfig) -> PacingRe
                 f"{difference:.1f}% da meta de {target_seconds:.1f}s",
             )
         )
+    if profile:
+        minimum = profile.episode_seconds.min
+        maximum = profile.episode_seconds.max
+        if not minimum <= estimated_runtime_s <= maximum:
+            issues.append(
+                _issue(
+                    config.enforcement.profile_duration,
+                    f"Runtime estimado de {estimated_runtime_s:.1f}s fora da faixa do perfil "
+                    f"{profile_name}: {minimum}-{maximum}s",
+                )
+            )
     return PacingReport(
         rows=rows,
         issues=issues,
         estimated_runtime_s=estimated_runtime_s,
         target_seconds=target_seconds,
+        profile_name=profile_name,
+        profile_resolution=profile.resolution if profile else "",
     )
 
 
 def pacing_table(report: PacingReport) -> Table:
     table = Table(
         title=(
-            f"Pacing lint · Runtime estimado: {report.estimated_runtime_s:.1f}s "
+            f"Pacing lint · Perfil: {report.profile_name or 'não configurado'} "
+            f"({report.profile_resolution or 'resolução desconhecida'}) · "
+            f"Runtime estimado: {report.estimated_runtime_s:.1f}s "
             f"/ meta: {report.target_seconds:.1f}s"
         )
     )

@@ -22,11 +22,21 @@ studio next revenge_republic ep01
 O projeto usa a pasta atual como raiz. Dados ficam em YAML/Markdown e mídia fica fora do Git.
 Consulte `ofcNOVELINHA_STUDIO_SPEC.md` para a especificação completa.
 
-## Custos atuais em 360p
+## Perfis e custos
 
-Imagens custam 0 créditos. Vídeos custam 5 créditos em 6 segundos, 6 créditos em 8 segundos
-e 7 créditos em 10 segundos. Esses valores ficam em `config/production.yaml` e podem ser
-alterados sem mudar o código.
+O perfil ativo vem de `active_profile` em `config/production.yaml`. Use `studio profile show`
+para consultar objetivo, resolução, faixa de duração, custos conhecidos e data de conferência.
+O arquivo de configuração é a única fonte de verdade para custos; valores `null` são
+desconhecidos e bloqueiam comandos que precisem calcular custo.
+
+```text
+studio profile show
+studio profile set growth
+studio profile set monetize
+```
+
+O perfil `growth` é destinado a vídeos curtos e baratos; `monetize` usa episódios longos e
+resolução 1080p. Antes de monetizar, o comando mostra `config/goals.yaml` se esse arquivo existir.
 
 ## Autoria e ritmo
 
@@ -62,6 +72,12 @@ vídeos curtos e baratos, de MONETIZAÇÃO, com episódios acima de 60 segundos 
 Esta fase adiciona delivery sem tons contraditórios, enforcement configurável para preenchimento
 e silêncio, validação de gancho e cliffhanger, runtime estimado com cold open e cobertura completa
 de testes. Créditos, sessão, métricas e publicação continuam fora do escopo.
+
+## Fase 1.8 — Perfis de produção
+
+O episódio pode sobrescrever o perfil da série, que sobrescreve `active_profile`. O lint compara
+o runtime com a faixa do perfil e avisa quando a resolução declarada do plano diverge. Custos
+desatualizados geram aviso no `validate`; a configuração nunca inventa custo desconhecido.
 
 ## Fase 1
 

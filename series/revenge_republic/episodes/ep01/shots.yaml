@@ -83,7 +83,7 @@ shots:
     files:
       image: assets/images/EP01_P01i_image.jpg
       video: assets/videos/EP01_P01_video.mp4
-    notes: "Usado como cold open, de 0 a 3,5 s."
+    notes: "Usado como cold open, de 0 a 3,0 s."
   - id: P02i
     order: 2
     beat_pt: "Manu e Duda ficam frente a frente antes da conversa difícil."
@@ -273,7 +273,7 @@ shots:
       - at_s: "4-6s"
         action: "Duda says not to open it, keeping her hand firmly on the lid."
         action_pt: "Duda diz para não abrir, mantendo a mão firme sobre a tampa."
-      - at_s: "6-8s"
+      - at_s: "5-6s"
         action: "Manu freezes with her hand in the air and looks from the box to Duda."
         action_pt: "Manu congela com a mão no ar e olha da caixa para Duda."
     timeline_pt:
@@ -283,7 +283,7 @@ shots:
         action_pt: "Duda coloca a palma sobre a tampa e empurra a caixa para longe de Manu."
       - at_s: "4-6s"
         action_pt: "Duda diz para não abrir, mantendo a mão firme sobre a tampa."
-      - at_s: "6-8s"
+      - at_s: "5-6s"
         action_pt: "Manu congela com a mão no ar e olha da caixa para Duda."
     end_state: "The box is closed and farther from Manu; Duda controls it and Manu is visibly suspicious."
     end_state_pt: "A caixa permanece fechada e mais distante de Manu; Duda a controla e Manu demonstra desconfiança."
@@ -305,10 +305,10 @@ shots:
     parent: P04i
     dialogue_pt:
       - speaker: duda
-        text: "Não abre isso aqui. Ainda não, eu preciso saber quem mandou o presente."
+        text: "Não abre isso aqui. Ainda não, preciso saber quem mandou."
       - speaker: manu
         text: "Então me explica agora."
-    duration_s: 8
+    duration_s: 6
     account: conta1
     status: todo
   - id: P05i
@@ -344,7 +344,7 @@ shots:
       - at_s: "4-6s"
         action: "Théo leans toward her and asks why she looked relieved."
         action_pt: "Théo se inclina para ela e pergunta por que ela pareceu aliviada."
-      - at_s: "6-8s"
+      - at_s: "5-6s"
         action: "Duda turns her face away and keeps both hands still, refusing to answer."
         action_pt: "Duda vira o rosto e mantém as duas mãos paradas, recusando-se a responder."
     timeline_pt:
@@ -354,7 +354,7 @@ shots:
         action_pt: "Ela percebe que Théo está observando e imediatamente desfaz o sorriso."
       - at_s: "4-6s"
         action_pt: "Théo se inclina para ela e pergunta por que ela pareceu aliviada."
-      - at_s: "6-8s"
+      - at_s: "5-6s"
         action_pt: "Duda vira o rosto e mantém as duas mãos paradas, recusando-se a responder."
     end_state: "Théo is openly suspicious; Duda avoids his eyes and the question remains unanswered."
     end_state_pt: "Théo está abertamente desconfiado; Duda evita os olhos dele e a pergunta fica sem resposta."
@@ -378,8 +378,8 @@ shots:
       - speaker: theo
         text: "Por que você ficou tão aliviada?"
       - speaker: duda
-        text: "Eu não fiquei aliviada. Você entendeu tudo errado desde o começo."
-    duration_s: 8
+        text: "Eu não fiquei aliviada. Você entendeu errado."
+    duration_s: 6
     account: conta1
     status: todo
   - id: P06i
@@ -415,12 +415,9 @@ shots:
       - at_s: "4-6s"
         action: "Duda slowly turns her head toward the doorway as if she heard a small sound."
         action_pt: "Duda vira lentamente a cabeça para a porta como se tivesse ouvido um pequeno ruído."
-      - at_s: "6-8s"
+      - at_s: "5-6s"
         action: "She keeps the phone hidden under the blanket and holds her breath."
         action_pt: "Ela esconde o celular sob o cobertor e prende a respiração."
-      - at_s: "8-10s"
-        action: "The camera pushes in on Duda's face while the doorway remains dark and empty."
-        action_pt: "A câmera se aproxima do rosto de Duda enquanto a porta permanece escura e vazia."
     timeline_pt:
       - at_s: "0-2s"
         action_pt: "Duda confere a porta e baixa a voz sem olhar para o celular."
@@ -428,10 +425,8 @@ shots:
         action_pt: "Ela diz que ainda está com a prova e aperta o celular contra o peito."
       - at_s: "4-6s"
         action_pt: "Duda vira lentamente a cabeça para a porta como se tivesse ouvido um pequeno ruído."
-      - at_s: "6-8s"
+      - at_s: "5-6s"
         action_pt: "Ela esconde o celular sob o cobertor e prende a respiração."
-      - at_s: "8-10s"
-        action_pt: "A câmera se aproxima do rosto de Duda enquanto a porta permanece escura e vazia."
     end_state: "Duda has the proof hidden, the doorway is still empty, and the threat is unresolved."
     end_state_pt: "Duda escondeu a prova, a porta continua vazia e a ameaça permanece sem solução."
     sound: "Very low room tone, a faint door creak, Duda's single whispered line, then restrained breathing."
@@ -454,11 +449,11 @@ shots:
     parent: P06i
     dialogue_pt:
       - speaker: duda
-        text: "A prova ainda tá comigo, e ninguém vai encontrar o celular escondido."
+        text: "A prova ainda tá comigo, e ninguém vai encontrar o celular."
         delivery: "low, cold, controlled"
         delivery_pt: "baixa, fria, controlada"
       - speaker: duda
-        text: "Vou decidir quando mostrar tudo para destruir a mentira de vez."
-    duration_s: 10
+        text: "Vou mostrar tudo depois."
+    duration_s: 6
     account: conta1
     status: todo

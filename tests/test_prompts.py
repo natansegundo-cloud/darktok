@@ -33,7 +33,7 @@ def test_validation_reports_videos_waiting_for_future_images() -> None:
 def test_ten_second_video_uses_seven_credits() -> None:
     bundle = ProjectLoader(ROOT).load_episode_bundle("revenge_republic", "ep01")
     shot = next(item for item in bundle.shots.shots if item.id == "P06")
-    assert render_prompt(ROOT, bundle, shot).cost == 7
+    assert render_prompt(ROOT, bundle, shot.model_copy(update={"duration_s": 10})).cost == 7
 
 
 def test_image_prompt_explains_reference_and_result() -> None:

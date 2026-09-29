@@ -314,7 +314,11 @@ def render_prompt(root: Path, bundle: LoadedEpisode, shot: Shot) -> PromptResult
         raise ValueError(f"Unknown location: {shot.location}")
     reference = _reference_for(bundle, shot, shots)
     production = load_production(root)
-    cost = production.shot_credits(shot)
+    profile_name = bundle.profile_name or production.effective_profile_name(
+        bundle.series.profile, bundle.episode.profile
+    )
+    profile = production.profile(profile_name)
+    cost = production.shot_credits(shot, resolution=profile.resolution)
     environment = _template_environment(root)
     selected = [characters[item] for item in shot.characters if item in characters]
     light = shot.light or location.default_light

@@ -23,6 +23,7 @@ shots:
     reference_from: null
     light: lighting in English
     light_pt: iluminação em português
+    resolution: null
     dialogue_pt: []
     voice_over_pt: []
     intentional_silence: false

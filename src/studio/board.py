@@ -56,6 +56,10 @@ def _next_action(episode_dir: Path, shot: Shot, parent: Shot | None) -> str:
 def board_rows(bundle: LoadedEpisode) -> list[BoardRow]:
     shots = {shot.id: shot for shot in bundle.shots.shots}
     production = load_production(bundle.series_dir.parent.parent)
+    profile_name = bundle.profile_name or production.effective_profile_name(
+        bundle.series.profile, bundle.episode.profile
+    )
+    profile = production.profile(profile_name)
     rows: list[BoardRow] = []
     for shot in sorted(bundle.shots.shots, key=lambda item: item.order):
         parent = shots.get(shot.parent) if shot.parent else None
@@ -66,7 +70,11 @@ def board_rows(bundle: LoadedEpisode) -> list[BoardRow]:
         status = shot.status if is_image else (
             f"imagem {_status_label(parent)} / vídeo {shot.status}"
         )
-        cost = "0" if is_image else str(production.video_credits(shot.duration_s))
+        cost = (
+            "0"
+            if is_image
+            else str(production.video_credits(shot.duration_s, resolution=profile.resolution))
+        )
         rows.append(
             BoardRow(
                 order=shot.order,
@@ -86,8 +94,14 @@ def board_rows(bundle: LoadedEpisode) -> list[BoardRow]:
 
 def render_board(bundle: LoadedEpisode) -> str:
     rows = board_rows(bundle)
+    production = load_production(bundle.series_dir.parent.parent)
+    profile_name = bundle.profile_name or production.effective_profile_name(
+        bundle.series.profile, bundle.episode.profile
+    )
+    profile = production.profile(profile_name)
     lines = [
-        f"# Production board — {bundle.series.title} · {bundle.episode.id}",
+        f"# Production board — {bundle.series.title} · {bundle.episode.id} · "
+        f"Perfil: {profile_name} ({profile.resolution})",
         "",
         "> Use `studio next` para executar somente a próxima ação. `MISSING` indica que o "
         "caminho foi registrado, mas o arquivo ainda não está na pasta.",

@@ -3,11 +3,12 @@ from __future__ import annotations
 from pathlib import Path
 
 import typer
+import yaml
 from rich.console import Console
 
 from .authoring import check_brief, create_brief, scaffold_episode
 from .board import next_row, write_board
-from .config import load_production
+from .config import load_goals, load_production, set_active_profile
 from .loader import ProjectLoader
 from .pacing import lint_bundle, pacing_table
 from .prompts import validate_bundle, write_prompts
@@ -17,13 +18,24 @@ app = typer.Typer(help="Offline production studio for vertical AI dramas.", no_a
 series_app = typer.Typer(help="Manage series.", no_args_is_help=True)
 style_app = typer.Typer(help="Manage style presets.", no_args_is_help=True)
 brief_app = typer.Typer(help="Manage Portuguese authoring briefs.", no_args_is_help=True)
+profile_app = typer.Typer(help="Manage production profiles.", no_args_is_help=True)
 app.add_typer(series_app, name="series")
 app.add_typer(style_app, name="style")
 app.add_typer(brief_app, name="brief")
+app.add_typer(profile_app, name="profile")
 
 
 def _root() -> Path:
     return Path.cwd()
+
+
+def _profile_header(production, profile_name: str) -> str:
+    profile = production.profile(profile_name)
+    bounds = profile.episode_seconds
+    return (
+        f"Perfil ativo: {profile_name} · {profile.resolution} · "
+        f"episódios {bounds.min}-{bounds.max}s"
+    )
 
 
 @app.command()
@@ -142,6 +154,7 @@ def validate(
 ) -> None:
     """Validate a series or one episode."""
     loader = ProjectLoader(_root())
+    production = load_production(_root())
     if not episode_id:
         try:
             series = loader.load_series(series_id)
@@ -151,15 +164,26 @@ def validate(
         except Exception as exc:
             typer.echo(f"ERROR: {exc}")
             raise typer.Exit(code=1) from exc
+        try:
+            profile_name = production.effective_profile_name(series.profile)
+            typer.echo(_profile_header(production, profile_name))
+        except ValueError as exc:
+            typer.echo(f"ERROR: {exc}")
+            raise typer.Exit(code=1) from exc
+        if warning := production.costs_warning():
+            typer.echo(f"WARNING: {warning}")
         typer.echo(f"OK: {series_id}")
         return
     try:
         bundle = loader.load_episode_bundle(series_id, episode_id)
         issues = validate_bundle(bundle)
-        report = lint_bundle(bundle, load_production(_root()))
+        report = lint_bundle(bundle, production)
     except Exception as exc:
         typer.echo(f"ERROR: {exc}")
         raise typer.Exit(code=1) from exc
+    typer.echo(_profile_header(production, report.profile_name))
+    if warning := production.costs_warning():
+        typer.echo(f"WARNING: {warning}")
     for issue in issues:
         prefix = issue.level.upper()
         suffix = f" [{issue.shot_id}]" if issue.shot_id else ""
@@ -174,12 +198,14 @@ def validate(
 def lint(series_id: str, episode_id: str) -> None:
     """Check spoken pacing, intentional silence, beats, and Portuguese mirrors."""
     loader = ProjectLoader(_root())
+    production = load_production(_root())
     try:
         bundle = loader.load_episode_bundle(series_id, episode_id)
-        report = lint_bundle(bundle, load_production(_root()))
+        report = lint_bundle(bundle, production)
     except Exception as exc:
         typer.echo(f"ERROR: {exc}")
         raise typer.Exit(code=1) from exc
+    typer.echo(_profile_header(production, report.profile_name))
     for issue in report.issues:
         prefix = issue.level.upper()
         suffix = f" [{issue.shot_id}]" if issue.shot_id else ""
@@ -251,6 +277,8 @@ def next(series_id: str, episode_id: str) -> None:
     except Exception as exc:
         typer.echo(f"ERROR: {exc}")
         raise typer.Exit(code=1) from exc
+    production = load_production(_root())
+    typer.echo(_profile_header(production, bundle.profile_name))
     if row is None:
         typer.echo("Episódio concluído: todos os planos estão aprovados.")
         return
@@ -278,8 +306,59 @@ def credits() -> None:
     """Show configured media costs."""
     config = load_production(_root())
     typer.echo(f"Image: {config.image.credits} credits")
-    for duration, cost in sorted(config.video.duration_credits.items()):
-        typer.echo(f"Video {duration}s ({config.video.resolution}): {cost} credits")
+    for resolution, costs in sorted(config.video.costs.items()):
+        for duration, cost in sorted(costs.items()):
+            label = "desconhecido" if cost is None else f"{cost} créditos"
+            typer.echo(f"Video {duration}s ({resolution}): {label}")
+
+
+@profile_app.command("show")
+def profile_show() -> None:
+    """Show the active production profile and known costs."""
+    config = load_production(_root())
+    try:
+        profile_name = config.effective_profile_name()
+        profile = config.profile(profile_name)
+    except ValueError as exc:
+        typer.echo(f"ERROR: {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(_profile_header(config, profile_name))
+    typer.echo(f"Objetivo: {profile.purpose_pt}")
+    typer.echo(f"Cold open: {'sim' if profile.cold_open else 'não'}")
+    typer.echo("Custos conhecidos:")
+    for resolution, costs in sorted(config.video.costs.items()):
+        values = ", ".join(
+            f"{duration}s={cost if cost is not None else 'desconhecido'}"
+            for duration, cost in sorted(costs.items())
+        )
+        typer.echo(f"  {resolution}: {values}")
+    verified = (
+        config.video.costs_verified_on.isoformat()
+        if config.video.costs_verified_on
+        else "nunca"
+    )
+    typer.echo(f"Custos conferidos em: {verified}")
+    if warning := config.costs_warning():
+        typer.echo(f"WARNING: {warning}")
+
+
+@profile_app.command("set")
+def profile_set(profile_name: str) -> None:
+    """Set the active production profile."""
+    config = load_production(_root())
+    try:
+        config.profile(profile_name)
+        path = set_active_profile(_root(), profile_name)
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    typer.echo(f"Perfil ativo definido: {profile_name} ({path})")
+    if profile_name == "monetize":
+        goals = load_goals(_root())
+        typer.echo("Requisitos de qualificação:")
+        if goals is None:
+            typer.echo("  config/goals.yaml ainda não existe.")
+        else:
+            typer.echo(yaml.safe_dump(goals, allow_unicode=True, sort_keys=False).rstrip())
 
 
 if __name__ == "__main__":

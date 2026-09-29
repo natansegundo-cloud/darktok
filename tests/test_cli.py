@@ -27,3 +27,40 @@ def test_brief_new_and_check_commands_report_empty_sections(tmp_path: Path, monk
     checked = RUNNER.invoke(app, ["brief", "check", "demo"])
     assert checked.exit_code == 1
     assert "Premissa" in checked.stdout
+
+
+def test_profile_show_and_set_commands(tmp_path: Path, monkeypatch) -> None:
+    import shutil
+
+    for directory in ("config", "series", "styles"):
+        shutil.copytree(ROOT / directory, tmp_path / directory)
+    production_path = tmp_path / "config" / "production.yaml"
+    production_path.write_text(
+        production_path.read_text(encoding="utf-8").replace(
+            "active_profile: growth", "active_profile: growth  # selected by the producer"
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    shown = RUNNER.invoke(app, ["profile", "show"])
+    assert shown.exit_code == 0
+    assert "Perfil ativo: growth" in shown.stdout
+    assert "1080p" in shown.stdout
+    changed = RUNNER.invoke(app, ["profile", "set", "monetize"])
+    assert changed.exit_code == 0
+    assert "Requisitos de qualificação" in changed.stdout
+    assert "goals.yaml ainda não existe" in changed.stdout
+    assert "active_profile: monetize  # selected by the producer" in production_path.read_text(
+        encoding="utf-8"
+    )
+
+
+def test_validate_prints_profile_and_stale_cost_warning() -> None:
+    result = RUNNER.invoke(
+        app,
+        ["validate", "revenge_republic", "ep01"],
+        env={"PWD": str(ROOT)},
+    )
+    assert result.exit_code == 1
+    assert "Perfil ativo: growth" in result.stdout
+    assert "Conferir custos na interface do Flow: eles mudam" in result.stdout

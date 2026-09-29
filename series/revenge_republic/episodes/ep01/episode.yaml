@@ -6,7 +6,7 @@ cold_open:
   enabled: true
   source_shot: P01
   trim_start_s: 0.0
-  trim_end_s: 3.5
+  trim_end_s: 3.0
   transition: "white flash + impact sound"
   title_card_pt: "Horas antes..."
 cliffhanger: "Duda revela ao telefone que ainda tem uma prova contra Manu."
@@ -14,4 +14,4 @@ season_finale: false
 key_prop: "small wrapped gift"
 status: generating
 metrics: {}
-notes: "Imagens aprovadas primeiro; vídeos pendentes seguem a tabela de custos atual."
+notes: "Fixture de teste; o perfil growth controla resolução e faixa de runtime."

@@ -90,7 +90,7 @@ def test_voice_over_counts_as_speech() -> None:
 def test_intentional_silence_is_allowed_but_episode_limit_warns() -> None:
     shots = [
         _video("P01", intentional_silence=True, beat_pt="primeiro golpe"),
-        _video("P02", order=1, intentional_silence=True, beat_pt="segundo golpe"),
+        _video("P02", order=1, duration_s=9, intentional_silence=True, beat_pt="segundo golpe"),
     ]
     report = lint_bundle(_bundle_with(*shots), load_production(ROOT))
     assert not _messages(report, "error")
@@ -230,6 +230,35 @@ def test_season_finale_may_omit_cliffhanger() -> None:
     )
     report = lint_bundle(bundle, ProductionConfig())
     assert not any("cliffhanger" in message for message in _messages(report))
+
+
+def test_profile_duration_and_resolution_rules() -> None:
+    short_bundle = _bundle_with(_video(resolution="1080p"))
+    report = lint_bundle(short_bundle, load_production(ROOT))
+    assert any("fora da faixa do perfil" in message for message in _messages(report, "error"))
+    assert any("Resolução do plano" in message for message in _messages(report, "warning"))
+
+    passing_bundle = _bundle_with(
+        _video("P01", duration_s=8),
+        _video("P02", order=1, duration_s=9, beat_pt="outro beat"),
+    )
+    passing = lint_bundle(passing_bundle, load_production(ROOT))
+    assert not any("fora da faixa do perfil" in message for message in _messages(passing))
+
+    warning_config = load_production(ROOT)
+    warning_pacing = warning_config.pacing.model_copy(
+        update={
+            "enforcement": warning_config.pacing.enforcement.model_copy(
+                update={"profile_duration": "warning"}
+            )
+        }
+    )
+    warning_config = warning_config.model_copy(update={"pacing": warning_pacing})
+    warning_report = lint_bundle(short_bundle, warning_config)
+    assert any(
+        "fora da faixa do perfil" in message
+        for message in _messages(warning_report, "warning")
+    )
 
 
 def test_fixture_copy_fails_when_speech_is_removed(tmp_path: Path) -> None:
