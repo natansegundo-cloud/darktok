@@ -109,3 +109,19 @@ def test_profile_precedence_episode_then_series_then_config(tmp_path: Path) -> N
         yaml.safe_dump(series_data, allow_unicode=True, sort_keys=False), encoding="utf-8"
     )
     assert loader.load_episode_bundle("revenge_republic", "ep01").profile_name == "growth"
+
+
+def test_character_silhouette_and_safety_fields_load() -> None:
+    from studio.models import Character, SafetyConfig
+
+    character = Character(
+        id="odd",
+        name="Odd",
+        lock_block="Odd, a person with a triangular nose",
+        silhouette_hook="triangular nose",
+        silhouette_hook_pt="nariz triangular",
+        palette="violet and mustard",
+    )
+    assert character.silhouette_hook == "triangular nose"
+    assert character.palette == "violet and mustard"
+    assert SafetyConfig().blocked_terms == []

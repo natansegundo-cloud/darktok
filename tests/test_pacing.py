@@ -6,7 +6,14 @@ import yaml
 
 from studio.config import load_production
 from studio.loader import ProjectLoader
-from studio.models import DialogueLine, ProductionConfig, Shot, ShotsFile
+from studio.models import (
+    CharactersFile,
+    DialogueLine,
+    ProductionConfig,
+    SafetyConfig,
+    Shot,
+    ShotsFile,
+)
 from studio.pacing import lint_bundle, shot_words
 
 ROOT = Path(__file__).parents[1]
@@ -259,6 +266,66 @@ def test_profile_duration_and_resolution_rules() -> None:
         "fora da faixa do perfil" in message
         for message in _messages(warning_report, "warning")
     )
+
+
+def test_style_requiring_silhouette_warns_for_missing_hooks() -> None:
+    bundle = _bundle_with(_video())
+    style = bundle.style.model_copy(
+        update={
+            "character_rules": "Each character needs a silhouette hook.",
+            "character_rules_pt": "Cada personagem precisa de uma silhueta.",
+        }
+    )
+    report = lint_bundle(replace(bundle, style=style), ProductionConfig())
+    assert any("não tem silhouette_hook" in message for message in _messages(report, "warning"))
+
+
+def test_silhouette_hook_must_appear_in_lock_block() -> None:
+    bundle = _bundle_with(_video(characters=["manu"]))
+    character = bundle.characters.characters[0].model_copy(
+        update={"silhouette_hook": "triangular nose"}
+    )
+    report = lint_bundle(
+        replace(bundle, characters=CharactersFile(characters=[character])), ProductionConfig()
+    )
+    assert any(
+        "silhouette_hook" in message and "lock_block" in message
+        for message in _messages(report, "warning")
+    )
+
+
+def test_same_silhouette_or_hair_color_in_one_shot_warns() -> None:
+    bundle = _bundle_with(_video(characters=["manu", "duda"]))
+    first, second = bundle.characters.characters[:2]
+    first = first.model_copy(update={"silhouette_hook": "square jaw", "hair_color": "violet"})
+    second = second.model_copy(
+        update={"silhouette_hook": "square jaw", "hair_color": "VIOLET"}
+    )
+    report = lint_bundle(
+        replace(bundle, characters=CharactersFile(characters=[first, second])), ProductionConfig()
+    )
+    warnings = _messages(report, "warning")
+    assert any("mesmo silhouette_hook" in message for message in warnings)
+    assert any("mesma hair_color" in message for message in warnings)
+
+
+def test_blocked_terms_are_errors_in_lock_style_and_action() -> None:
+    bundle = _bundle_with(_video(action="forbidden action"))
+    character = bundle.characters.characters[0].model_copy(
+        update={"lock_block": "Manu, forbidden character"}
+    )
+    style = bundle.style.model_copy(update={"style_block": "forbidden style"})
+    production = ProductionConfig(safety=SafetyConfig(blocked_terms=["forbidden"]))
+    report = lint_bundle(
+        replace(
+            bundle,
+            characters=CharactersFile(characters=[character]),
+            style=style,
+        ),
+        production,
+    )
+    errors = _messages(report, "error")
+    assert sum("Termo bloqueado 'forbidden'" in message for message in errors) == 3
 
 
 def test_fixture_copy_fails_when_speech_is_removed(tmp_path: Path) -> None:

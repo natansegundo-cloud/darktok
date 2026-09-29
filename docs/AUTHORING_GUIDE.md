@@ -75,10 +75,31 @@ status: planning
 
 Cada personagem tem `id`, `name`, `role`, `age`, `lock_version`, `lock_block` e `lock_block_pt`.
 Use `nicknames` com `used_by` para apelidos controlados; `signature_element` deve aparecer no
-lock; `hair_color` ajuda a detectar confusão no mesmo plano. `default_delivery` e
-`default_delivery_pt` definem um único tom de voz para falas que não especificarem delivery.
-`voice_notes`, `bio_pt`, `arc_pt` e `approved_reference` completam a ficha; `voice_notes` é nota
-de autoria e nunca entra no prompt.
+lock; `hair_color` ajuda a detectar confusão no mesmo plano. `silhouette_hook` e
+`silhouette_hook_pt` registram a feature absurda constante; `palette` registra a paleta exclusiva
+do personagem. `default_delivery` e `default_delivery_pt` definem um único tom de voz para falas
+que não especificarem delivery. `voice_notes`, `bio_pt`, `arc_pt` e `approved_reference`
+completam a ficha; `voice_notes` é nota de autoria e nunca entra no prompt.
+
+## Personagem estranho que se mantém consistente
+
+Para cada personagem, escolha uma única feature absurda e geométrica: um corte de cabelo
+impossível, nariz triangular, queixo muito largo ou sobrancelhas angulares. Registre essa feature
+em `silhouette_hook`, repita-a literalmente no `lock_block` e preencha seu espelho
+`silhouette_hook_pt`. O lint avisa quando a feature não aparece no lock.
+
+Use uma paleta de cor própria para cada personagem, principalmente na roupa e em um acessório
+visível. Mantenha constantes as proporções entre cabeça e corpo, o tamanho da feature e o desenho
+da silhueta em todos os planos. O estilo 3D estilizado é mais fácil de manter que o realista em
+360p porque a forma exagerada continua legível mesmo quando a imagem perde detalhe fino.
+
+O lock_block segue a imagem aprovada: depois de aprovar uma imagem, ajuste o lock para descrever
+exatamente cabelo, roupa, proporções e feature que a câmera realmente mostra, incremente
+`lock_version` e registre a decisão em `docs/LESSONS.md`.
+
+Não use personagens de IP existente, semelhança com pessoas reais ou celebridades, nomes de
+franquias ou logotipos. `safety.blocked_terms` é uma rede de segurança configurável, não uma
+garantia de detecção completa.
 
 ### `locations.yaml`
 
@@ -143,7 +164,9 @@ revisão humana.
 
 ## Estilo e ações
 
-O padrão é contemporâneo e realista. Nunca invente uma época, como “1990s”, sem que a série peça.
+O preset ativo define a linguagem visual. Para a série nova, use `weird_toon`: caricatura 3D
+estranha, não realista, com proporções exageradas e expressões legíveis. Nunca invente uma época,
+como “1990s”, sem que a série peça.
 Escreva apenas ações filmáveis: mão abrindo uma gaveta, mensagem aparecendo no celular, objeto
 sendo escondido, mudança visível de expressão ou fala. Não descreva sentimento interno sem uma
 ação ou fala que o revele.
@@ -170,6 +193,8 @@ ação ou fala que o revele.
 - [ ] Brief preenchido e conferido com `studio brief check`.
 - [ ] Série, personagens, locais e estilo têm os espelhos `_pt`.
 - [ ] Cada lock block descreve somente elementos visíveis e está versionado.
+- [ ] Cada personagem tem uma `silhouette_hook` absurda, constante e presente no `lock_block`.
+- [ ] Cada personagem tem uma paleta de roupa distinta e proporções fixas.
 - [ ] Cada plano tem beat novo e ação filmável.
 - [ ] Cada vídeo tem contexto, estado inicial, timeline, estado final e restrições.
 - [ ] Cada vídeo tem fala/voz off ou silêncio intencional permitido.

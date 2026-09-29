@@ -21,3 +21,6 @@
 - `series/revenge_republic` é apenas fixture pausada de testes; a série real ainda não existe.
 - A bíblia é contrato verificável: o template não cria conteúdo, mas exige seções completas,
   grade com cliffhanger e nenhuma instrução de placeholder antes de uma série entrar em produção.
+- Em personagens 3D estranhos, uma única silhueta geométrica e uma paleta de roupa exclusiva são
+  mais fáceis de conferir em 360p do que detalhes realistas; `safety.blocked_terms` ajuda, mas não
+  garante detectar toda referência de IP ou semelhança com pessoa real.

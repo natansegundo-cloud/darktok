@@ -1,3 +1,17 @@
-characters: []
 # Each character needs a literal English lock_block and its faithful Portuguese reading.
 # lock_block_pt: tradução visual do lock_block, sem sentimentos ou época
+# silhouette_hook: one absurd, constant silhouette feature in English.
+# silhouette_hook_pt: espelho em português para revisão humana.
+# palette: paleta de cor exclusiva do personagem, em formato livre.
+# Exemplo estrutural; substitua todos os valores antes de usar.
+# characters:
+#   - id: character_id
+#     name: "Nome do personagem"
+#     lock_block: "Character, one visible fixed description"
+#     lock_block_pt: "Personagem, uma descrição visual fixa e visível"
+#     silhouette_hook: "one absurd geometric feature"
+#     silhouette_hook_pt: "um elemento geométrico absurdamente marcante"
+#     palette: "cor de roupa exclusiva e acessórios"
+#     default_delivery: "one consistent voice tone"
+#     default_delivery_pt: "um único tom de voz consistente"
+characters: []

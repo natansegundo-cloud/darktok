@@ -310,6 +310,12 @@ characters:
 
     hair\_color: blonde
 
+    silhouette\_hook: "geometric triangular nose"
+
+    silhouette\_hook\_pt: "nariz triangular geométrico"
+
+    palette: "pastel pink, gold and black"
+
     voice\_notes: "voz suave e doce em público; baixa e fria quando está sozinha"
 
     default\_delivery: "low, cold, controlled"
@@ -326,6 +332,11 @@ Regras de validação:
 
 - `lock_block` obrigatório, uma única linha lógica em inglês.  
 - Aviso se dois personagens com `hair_color` igual aparecerem no mesmo plano.  
+- Aviso: personagem sem `silhouette_hook` quando `character_rules` do estilo exige silhueta.
+- Aviso: `silhouette_hook` ausente do `lock_block`.
+- Aviso: dois personagens no mesmo plano com `silhouette_hook` ou `hair_color` iguais.
+- Erro: termo em `safety.blocked_terms` encontrado em `lock_block`, `style_block` ou `action`. A
+  lista é uma rede de segurança heurística, não uma garantia contra IP ou semelhança.
 - Aviso se `signature_element` não aparecer dentro do `lock_block`.  
 - O `lock_block` só muda com incremento de `lock_version` e nota em `docs/LESSONS.md`. Mudança de `lock_version` deve gerar aviso de que planos já aprovados usam a versão antiga.  
 - `nicknames` alimentam as falas: o Studio avisa se um personagem que não está em `used_by` usa o apelido no `dialogue_pt`.
@@ -548,6 +559,10 @@ bible:
   min_section_chars: 80
 
   placeholder_markers: ["TODO", "Describe", "Descreva", "XXX"]
+
+safety:
+
+  blocked_terms: []                 \# exemplo: ["nome de franquia", "celebridade"]
 
 active_profile: growth
 
@@ -834,6 +849,16 @@ Todos os comandos devem funcionar offline, imprimir saída legível no terminal 
 - O lint valida faixa de runtime, resolução do plano e exibe o perfil nos comandos de produção.
   Esta fase não inclui sessão, métricas ou publicação.
 
+**Fase 1.9 — Preset de estilo e personagem estranho**
+
+- `styles/weird_toon.yaml` define caricatura 3D estranha, não realista, com todos os espelhos
+  `_pt`, proporções exageradas e uma silhueta constante por personagem.
+- Personagens aceitam `silhouette_hook`, `silhouette_hook_pt` e `palette`; o lint avisa ausência,
+  divergência do `lock_block` e colisões de silhueta/cabelo no mesmo plano.
+- `safety.blocked_terms` bloqueia termos configuráveis em lock blocks, estilo e ação. É uma
+  heurística de segurança, não garantia de ausência de IP ou semelhança com pessoa real. Esta fase
+  não inclui créditos, sessão ou métricas.
+
 **Fase 1.10 — Bíblia de série verificável**
 
 - `templates/series/bible.md` define cabeçalhos obrigatórios e instruções sem inventar a premissa,
@@ -962,10 +987,10 @@ Leia \`docs/SPEC.md\` antes de qualquer tarefa.
 - A estratégia aprovada tem duas etapas: CRESCIMENTO com vídeos curtos e baratos até a
   qualificação; MONETIZAÇÃO com episódios acima de 60 s e resolução 1080p.
 - Perfil ativo: `growth`, com episódios de 20 a 45 segundos e cold open configurado.
-- Fase de desenvolvimento do Studio: **Fase 1.8 — Perfis de produção**. O lint controla
-  delivery, ritmo, runtime, faixa do perfil e resolução; `studio profile show/set` gerencia o
-  perfil ativo. A Fase 1.10 adiciona a bíblia verificável, o check de placeholders, a grade de
-  episódios e os cliffhangers antes de produção. Fases 2+ continuam não implementadas.
+- Fase de desenvolvimento do Studio: **Fases 1.9 e 1.10 concluídas**. O Studio agora tem o
+  preset `weird_toon`, lint de silhueta/termos bloqueados e a bíblia verificável, além do controle
+  de ritmo, runtime, perfis e resolução. A série real ainda não foi criada; Fases 2+ continuam
+  não implementadas.
 
 ## 17\. LIÇÕES INICIAIS (COPIAR PARA `docs/LESSONS.md`)
 

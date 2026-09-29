@@ -27,6 +27,9 @@ class Character(StudioModel):
     lock_block_pt: str = ""
     signature_element: str | None = None
     hair_color: str | None = None
+    silhouette_hook: str | None = None
+    silhouette_hook_pt: str | None = None
+    palette: str | list[str] | None = None
     voice_notes: str = ""
     default_delivery: str | None = None
     default_delivery_pt: str | None = None
@@ -209,6 +212,10 @@ class ImageConfig(StudioModel):
     credits: int = 0
 
 
+class SafetyConfig(StudioModel):
+    blocked_terms: list[str] = Field(default_factory=list)
+
+
 class AccountsConfig(StudioModel):
     count: int = 5
     daily_credits_per_account: int = 50
@@ -253,6 +260,7 @@ class ProductionConfig(StudioModel):
     aspect_ratio: str = "9:16"
     video: VideoConfig = Field(default_factory=VideoConfig)
     image: ImageConfig = Field(default_factory=ImageConfig)
+    safety: SafetyConfig = Field(default_factory=SafetyConfig)
     accounts: AccountsConfig = Field(default_factory=AccountsConfig)
     workflow: WorkflowConfig = Field(default_factory=WorkflowConfig)
     pacing: PacingConfig = Field(default_factory=PacingConfig)

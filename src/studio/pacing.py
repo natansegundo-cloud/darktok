@@ -111,6 +111,86 @@ def _character_delivery_issues(
     return issues
 
 
+def _character_style_issues(bundle: LoadedEpisode) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+    requires_silhouette = re.search(
+        r"\b(?:silhouette|silhueta)\b", bundle.style.character_rules, re.IGNORECASE
+    )
+    for character in bundle.characters.characters:
+        if requires_silhouette and not character.silhouette_hook:
+            issues.append(
+                _issue(
+                    "warning",
+                    f"Personagem {character.id} não tem silhouette_hook apesar das "
+                    "regras do estilo",
+                )
+            )
+        if character.silhouette_hook and (
+            character.silhouette_hook.casefold() not in character.lock_block.casefold()
+        ):
+            issues.append(
+                _issue(
+                    "warning",
+                    f"silhouette_hook não aparece no lock_block de {character.id}",
+                )
+            )
+    return issues
+
+
+def _character_visual_issues(bundle: LoadedEpisode, shot: Shot) -> list[ValidationIssue]:
+    present = [
+        character
+        for character_id in shot.characters
+        for character in bundle.characters.characters
+        if character.id == character_id
+    ]
+    issues: list[ValidationIssue] = []
+    hooks = [
+        character.silhouette_hook.casefold()
+        for character in present
+        if character.silhouette_hook
+    ]
+    if len(hooks) != len(set(hooks)):
+        issues.append(
+            _issue(
+                "warning",
+                "Dois personagens no plano têm o mesmo silhouette_hook",
+                shot.id,
+            )
+        )
+    hair_colors = [character.hair_color.casefold() for character in present if character.hair_color]
+    if len(hair_colors) != len(set(hair_colors)):
+        issues.append(
+            _issue("warning", "Dois personagens no plano têm a mesma hair_color", shot.id)
+        )
+    return issues
+
+
+def _safety_issues(bundle: LoadedEpisode, blocked_terms: list[str]) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+
+    def scan(text: str, location: str, shot_id: str | None = None) -> None:
+        folded = text.casefold()
+        for term in blocked_terms:
+            if term and term.casefold() in folded:
+                issues.append(
+                    _issue(
+                        "error",
+                        f"Termo bloqueado '{term}' encontrado em {location}; revise o conteúdo.",
+                        shot_id,
+                    )
+                )
+
+    for character in bundle.characters.characters:
+        scan(character.lock_block, f"lock_block de {character.id}")
+    scan(bundle.style.style_block, "style_block do estilo")
+    for shot in bundle.shots.shots:
+        scan(shot.action, "action", shot.id)
+        if shot.action_en and shot.action_en != shot.action:
+            scan(shot.action_en, "action_en", shot.id)
+    return issues
+
+
 def _missing_pt_issues(bundle: LoadedEpisode, shot: Shot) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
 
@@ -252,6 +332,8 @@ def lint_bundle(bundle: LoadedEpisode, production: ProductionConfig) -> PacingRe
     intentional_count = 0
     characters = {item.id: item for item in bundle.characters.characters}
     issues.extend(_character_delivery_issues(characters, config.delivery_forbidden_markers))
+    issues.extend(_character_style_issues(bundle))
+    issues.extend(_safety_issues(bundle, production.safety.blocked_terms))
     profile_name = bundle.episode.profile or bundle.series.profile or production.active_profile
     profile = production.profiles.get(profile_name)
     if production.profiles and profile is None:
@@ -263,6 +345,7 @@ def lint_bundle(bundle: LoadedEpisode, production: ProductionConfig) -> PacingRe
         )
 
     for shot in ordered:
+        issues.extend(_character_visual_issues(bundle, shot))
         words = shot_words(shot)
         is_video = shot.kind in VIDEO_KINDS
         duration = float(shot.duration_s) if is_video else 0.0

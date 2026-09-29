@@ -214,14 +214,6 @@ def validate_shot(bundle: LoadedEpisode, shot: Shot) -> list[ValidationIssue]:
             )
 
     present = [characters[item] for item in shot.characters if item in characters]
-    hair_colors = [item.hair_color for item in present if item.hair_color]
-    if len(hair_colors) != len(set(hair_colors)):
-        issues.append(
-            ValidationIssue(
-                level="warning", message="Two characters share hair_color", shot_id=shot.id
-            )
-        )
-
     for character in present:
         if not character.lock_block.strip() or "\n" in character.lock_block:
             issues.append(

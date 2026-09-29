@@ -55,6 +55,11 @@ studio lint revenge_republic ep01
 beats repetidos e traduções `_pt` ausentes. Consulte `docs/AUTHORING_GUIDE.md` antes de criar
 uma série ou episódio. A geração de mídia continua manual e offline.
 
+O preset `styles/weird_toon.yaml` é a referência para personagens 3D caricaturais, estranhos e
+memoráveis. O lint verifica a silhueta constante, colisões de cabelo/silhueta no mesmo plano e
+os termos configurados em `safety.blocked_terms`. Essa lista é uma rede de segurança heurística,
+não uma garantia contra IP ou semelhança com pessoas reais.
+
 `studio bible check` verifica se a bíblia tem todas as seções obrigatórias, conteúdo suficiente,
 nenhum placeholder e uma grade completa de episódios com cliffhangers. Em séries `idea` ou
 `planning`, `validate` e `scaffold` exibem esses problemas como avisos; em `in_production`, eles
@@ -84,6 +89,12 @@ de testes. Créditos, sessão, métricas e publicação continuam fora do escopo
 O episódio pode sobrescrever o perfil da série, que sobrescreve `active_profile`. O lint compara
 o runtime com a faixa do perfil e avisa quando a resolução declarada do plano diverge. Custos
 desatualizados geram aviso no `validate`; a configuração nunca inventa custo desconhecido.
+
+## Fase 1.9 — Preset de estilo e personagem estranho
+
+Foi adicionado o preset `weird_toon`, com todos os espelhos `_pt`, além de `silhouette_hook`,
+`palette` e regras de consistência visual. A direção exige caricatura 3D não realista, sem IP,
+celebridades ou pessoas reais. Créditos, sessão e métricas continuam fora do escopo.
 
 ## Fase 1.10 — Bíblia de série verificável
 

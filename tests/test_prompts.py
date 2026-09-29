@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 
 from studio.loader import ProjectLoader
@@ -91,6 +92,29 @@ def test_style_rules_and_negative_hints_enter_image_prompt() -> None:
     result = render_prompt(ROOT, bundle, shot)
     assert "realistic features" in result.prompt
     assert "no watermark" in result.prompt
+
+
+def test_weird_toon_preset_enters_prompt_with_complete_mirrors(tmp_path: Path) -> None:
+    for directory in ("config", "series", "styles", "templates"):
+        shutil.copytree(ROOT / directory, tmp_path / directory)
+    series_path = tmp_path / "series" / "revenge_republic" / "series.yaml"
+    series_path.write_text(
+        series_path.read_text(encoding="utf-8").replace(
+            "style: realistic_drama", "style: weird_toon", 1
+        ),
+        encoding="utf-8",
+    )
+    bundle = ProjectLoader(tmp_path).load_episode_bundle("revenge_republic", "ep01")
+    shot = next(item for item in bundle.shots.shots if item.id == "P05i")
+    result = render_prompt(tmp_path, bundle, shot)
+    style = bundle.style
+    assert style.style_block_pt
+    assert style.negative_hints_pt
+    assert style.camera_defaults_pt
+    assert style.video_motion_defaults_pt
+    assert style.character_rules_pt
+    assert style.style_block in result.prompt
+    assert style.negative_hints in result.prompt
 
 
 def test_missing_portuguese_prompt_field_is_explicit() -> None:

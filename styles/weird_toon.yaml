@@ -1,0 +1,13 @@
+id: weird_toon
+name: "Caricatura estranha 3D"
+style_block: "Stylized 3D animated caricature characters with exaggerated uncanny proportions, oversized expressive heads on small bodies, absurdly geometric hairstyles, heavy-lidded expressive eyes, glossy sculpted clay-like skin, saturated slightly off-kilter color palette, polished cinematic 3D animation, soft studio lighting, vertical 9:16"
+style_block_pt: "Personagens caricaturais estilizados em animação 3D, com proporções estranhas e exageradas, cabeças expressivas grandes em corpos pequenos, penteados geometricamente absurdos, olhos expressivos com pálpebras pesadas, pele brilhante esculpida como argila, paleta saturada e levemente desalinhada, animação 3D cinematográfica refinada, iluminação suave de estúdio, vertical 9:16"
+negative_hints: "no text, no watermark, no photorealism, no real people, no celebrity likeness, no existing cartoon characters, no logos, no extra limbs, no deformed hands"
+negative_hints_pt: "sem texto, sem marca d'água, sem fotorrealismo, sem pessoas reais, sem semelhança com celebridades, sem personagens de desenhos existentes, sem logotipos, sem membros extras, sem mãos deformadas"
+camera_defaults: "steady close framing with slow push-ins, occasional slight dutch angle for tension"
+camera_defaults_pt: "enquadramento fechado e estável com aproximações lentas, ocasional ângulo holandês sutil para tensão"
+video_motion_defaults: "exaggerated but readable facial acting, slow deliberate body motion, minimal background motion"
+video_motion_defaults_pt: "atuação facial exagerada mas legível, movimento corporal lento e deliberado, movimento mínimo no fundo"
+character_rules: "Each main character has ONE absurdly distinctive silhouette element (haircut, nose, jaw or eyebrows) that stays identical in every shot; keep head-to-body proportions constant."
+character_rules_pt: "Cada personagem principal tem UM elemento de silhueta absurdamente distinto (corte de cabelo, nariz, queixo ou sobrancelhas) que permanece idêntico em todos os planos; mantenha constantes as proporções entre cabeça e corpo."
+notes: "Estilizado esconde falhas da IA melhor que realismo em 360p. Estranheza vem da silhueta, não de detalhe fino."

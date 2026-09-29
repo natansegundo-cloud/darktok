@@ -22,6 +22,9 @@ video:
   max_attempts: 2
 image:
   credits: 0
+safety:
+  blocked_terms: []
+  # Exemplo editável: blocked_terms: ["nome de franquia", "celebridade"]
 accounts:
   count: 5
   daily_credits_per_account: 50
